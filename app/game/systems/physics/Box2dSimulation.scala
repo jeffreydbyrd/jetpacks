@@ -15,7 +15,7 @@ import game.components.io.InputComponent
 
 class Box2dSimulation( gx: Int, gy: Int ) {
 
-  private val timestep = 1.0f / 10.0f
+  private val timestep = 1.0f / 20.0f
   private val velocityIterations = 6
   private val positionIterations = 2
 
@@ -45,14 +45,8 @@ class Box2dSimulation( gx: Int, gy: Int ) {
     else if ( snap.left ) m.setSpeed( -m.speed )
     else if ( snap.right ) m.setSpeed( m.speed )
 
-    if ( snap.jump && m.remainingJumpSteps > 0 ) {
-      m.jump()
-      m.remainingJumpSteps -= 1
-    }
-
-    if ( !snap.jump && m.remainingJumpSteps < Box2dMobile.maxJumpSteps ) {
-      m.remainingJumpSteps = 0
-    }
+    if (m.grounded && snap.jump) m.jump()
+    else if (snap.jump) m.boost()
   }
 
   def step() = {

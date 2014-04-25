@@ -16,9 +16,6 @@ class Box2dContactListener extends ContactListener {
     m <- feet.get( f )
   } {
     m.grounded = landing
-    if ( landing ) {
-      m.remainingJumpSteps = Box2dMobile.maxJumpSteps
-    }
   }
 
   def beginContact( contact: Contact ): Unit = feetContact( true, contact )

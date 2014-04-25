@@ -51,7 +51,7 @@ class ConnectionSystem extends System {
     val dimensions =
       new ComponentConfig(DimensionComponent.props(10, 10, 2, 2), s"dimensions_plr$numConnections")
     val mobility =
-      new ComponentConfig(MobileComponent.props(5, 8F), s"mobile_plr$numConnections")
+      new ComponentConfig(MobileComponent.props(20, 20F), s"mobile_plr$numConnections")
 
     val configs: EntityConfig = Map(
       Input -> input, Observer -> observer,

@@ -19,11 +19,12 @@ object MyGame {
     SystemConfig(ConnectionSystem.props, "connection_system"),
     SystemConfig(QuitSystem.props, "quit_system"),
     SystemConfig(VisualSystem.props, "visual_system"),
-    SystemConfig(PhysicsSystem.props(0, -10), "physics_system")
+    SystemConfig(PhysicsSystem.props(0, -35), "physics_system")
   )
 
   private val walls: Set[(ComponentType, ComponentConfig)] = Set(
-    Dimension -> new ComponentConfig(DimensionComponent.props(25, 1, 50, 1), "floor"),
+    Dimension -> new ComponentConfig(DimensionComponent.props(25, 0, 50, 1), "floor"),
+    Dimension -> new ComponentConfig(DimensionComponent.props(25, 50, 50, 1), "ceiling"),
     Dimension -> new ComponentConfig(DimensionComponent.props(0, 25, 1, 50), "left_wall"),
     Dimension -> new ComponentConfig(DimensionComponent.props(50, 25, 1, 50), "right_wall")
   )
