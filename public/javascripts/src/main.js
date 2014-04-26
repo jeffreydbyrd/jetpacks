@@ -7,7 +7,7 @@ var username = function() {
 var address = function() {
   var href = window.location.href;
   var addr = href.substring(7, href.indexOf("/#"));
-  return "ws://" + addr + "/test?username=" + username;
+  return "ws://" + addr + "/play?username=" + username;
 }();
 
 var internal_dimensions = 50;

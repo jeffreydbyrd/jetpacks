@@ -8,6 +8,7 @@ import game.systems.connection.ConnectionSystem.AddPlayer
 import play.api.mvc._
 import akka.util.Timeout
 import play.api.libs.iteratee.{Enumerator, Input, Done, Iteratee}
+import game.MyGame
 
 object PlayController extends Controller {
   import play.Logger
@@ -31,7 +32,7 @@ object PlayController extends Controller {
   def websocket(username: String) = WebSocket.async[String] {
     implicit request =>
       Logger.info(s"$username requested WebSocket connection")
-      (game.MyGame.connectionSystem ? AddPlayer(username)) map {
+      (MyGame.connectionSystem ? AddPlayer(username)) map {
 
         case ConnectionSystem.Connected(connection, enumerator) => // Success
           val iter = Iteratee.foreach[String] {
