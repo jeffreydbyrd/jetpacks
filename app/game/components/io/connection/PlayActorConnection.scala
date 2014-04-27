@@ -47,7 +47,7 @@ class PlayActorConnection(val toClient: Channel[String]) extends Actor {
             "ack":${cc.doRetry},
             "type": "${cc.typ}",
     	      "message" : ${cc.toJson}} """
-    toClient push msg
+    toClient.push(msg)
     if (cc.doRetry) {
       retry(msg)
       seq += 1

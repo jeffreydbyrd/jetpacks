@@ -68,7 +68,6 @@ class ConnectionSystem extends System {
     context.watch(connection)
   }
 
-
   override def receive: Receive = LoggingReceive {
     case UpdateEntities(v, _) => entityVersion = v
     case Tick => sender ! TickAck
