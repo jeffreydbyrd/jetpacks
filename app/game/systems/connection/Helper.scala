@@ -7,6 +7,7 @@ import doppelengine.entity.EntityConfig
 import doppelengine.core.Engine
 import doppelengine.system.System.UpdateEntities
 import akka.util.Timeout
+import doppelengine.core.Engine.OpFailure
 
 object Helper {
   def props(ngin: ActorRef, conn: ActorRef, numConns: Int, v: Long, config: EntityConfig) =
@@ -24,11 +25,11 @@ class Helper(ngin: ActorRef, conn: ActorRef, numConns: Int, var v: Long, config:
 
 
   override def receive: Receive = {
-    case correction: UpdateEntities =>
-      v = correction.version
+    case correction: OpFailure =>
+      v = correction.v
       attempt()
 
-    case ack: Engine.OpAck =>
+    case ack: Engine.OpSuccess =>
       self ! PoisonPill
       val inputSel = context.actorSelection(ngin.path / s"input_plr$numConns")
       val observerSel = context.actorSelection(ngin.path / s"observer_plr$numConns")

@@ -19,37 +19,40 @@ import game.components.types.{Observer, Input}
 
 object QuitSystem {
   implicit val timeout = Timeout(1.second)
-  def props = Props( classOf[ QuitSystem ] )
+
+  def props = Props(classOf[QuitSystem])
 }
 
 class QuitSystem extends System {
+
   import QuitSystem.timeout
 
-  val requiredComponents = List( Input, Observer )
+  val requiredComponents = List(Input, Observer)
 
-  override def receive = manage( 0, Set() )
+  override def receive = manage(0, Set())
 
-  def manage( version: Long, entities: Set[ Entity ] ): Receive =
+  def manage(version: Long, entities: Set[Entity]): Receive =
     LoggingReceive {
-      case System.UpdateEntities( v, ents ) if v > version =>
-        val es = for ( e <- ents if e.hasComponents( requiredComponents ) )
+      case System.UpdateEntities(v, ents) if v > version =>
+        val es =
+          for (e <- ents if e.hasComponents(requiredComponents))
           yield e
-        context.become( manage( v, es ) )
+        context.become(manage(v, es))
 
       case Tick =>
-        val setOfFutures: Set[ Future[ Entity ] ] =
-          entities.map { e =>
-            ( e( Input ) ? Component.RequestSnapshot )
-              .mapTo[ Snapshot ]
-              .filter( _.quit )
-              .map( _ => e )
+        val setOfFutures: Set[Future[Entity]] =
+          entities.map {
+            e =>
+              (e(Input) ? Component.RequestSnapshot)
+                .mapTo[Snapshot]
+                .filter(_.quit)
+                .map(_ => e)
           }
 
-        val futureSet: Future[ Set[ Entity ] ] = Future.sequence( setOfFutures )
-        futureSet.foreach { set =>
-          if ( set.nonEmpty ) context.parent ! Engine.Rem( version, set )
-        }
-        
+        val futureSet: Future[Set[Entity]] = Future.sequence(setOfFutures)
+        for (set <- futureSet if (set.nonEmpty))
+          context.parent ! Engine.Rem(version, set)
+
         sender ! TickAck
     }
 }
