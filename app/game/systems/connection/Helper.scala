@@ -23,7 +23,6 @@ class Helper(ngin: ActorRef, conn: ActorRef, numConns: Int, var v: Long, config:
 
   attempt()
 
-
   override def receive: Receive = {
     case correction: OpFailure =>
       v = correction.v

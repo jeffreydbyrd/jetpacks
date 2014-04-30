@@ -11,6 +11,7 @@ import play.api.libs.iteratee.Concurrent.Channel
 import play.api.libs.iteratee.Enumerator
 import game.components.io.{ClientCommand, ServerCommand}
 import play.api.libs.json.{JsValue, Json}
+import ClientCommand.ServerQuit
 
 object PlayActorConnection {
   type MessageId = Long
@@ -29,7 +30,6 @@ object PlayActorConnection {
 
 class PlayActorConnection(val toClient: Channel[String]) extends Actor {
 
-  import ClientCommand.ServerQuit
   import PlayActorConnection._
 
   var toServer: Option[ActorRef] = None
