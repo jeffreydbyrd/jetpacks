@@ -2,13 +2,11 @@ package game.systems.connection
 
 import akka.actor._
 import akka.event.LoggingReceive
-import doppelengine.system.System
 import play.api.libs.iteratee.Enumerator
 import game.components.io.{ObserverComponent, InputComponent}
 import game.components.physics.{MobileComponent, DimensionComponent}
 import doppelengine.component.ComponentConfig
-import doppelengine.core.Engine
-import doppelengine.system.System.UpdateEntities
+import doppelengine.system.System.{UpdateAck, UpdateEntities}
 import akka.actor.Terminated
 import doppelengine.entity.EntityConfig
 import game.components.io.connection.PlayActorConnection
@@ -29,10 +27,9 @@ object ConnectionSystem {
 
 }
 
-class ConnectionSystem extends System {
+class ConnectionSystem extends Actor {
 
   import ConnectionSystem._
-  import Engine._
 
   var connections: Map[String, ActorRef] = Map()
   var numConnections: Int = 0
@@ -69,8 +66,9 @@ class ConnectionSystem extends System {
   }
 
   override def receive: Receive = LoggingReceive {
-    case UpdateEntities(v, _) => entityVersion = v
-    case Tick => sender ! TickAck
+    case UpdateEntities(v, _) =>
+      entityVersion = v
+      sender ! UpdateAck(v)
 
     case AddPlayer(username) if !connections.contains(username) =>
       connectPlayer(username)

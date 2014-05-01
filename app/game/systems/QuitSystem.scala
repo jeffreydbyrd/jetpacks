@@ -3,15 +3,12 @@ package game.systems
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import akka.actor.Props
-import akka.actor.actorRef2Scala
+import akka.actor.{Actor, Props, actorRef2Scala}
 import akka.event.LoggingReceive
 import akka.pattern.ask
 import doppelengine.component.Component
 import game.components.io.InputComponent.Snapshot
 import doppelengine.core.Engine
-import doppelengine.core.Engine.Tick
-import doppelengine.core.Engine.TickAck
 import doppelengine.entity.Entity
 import doppelengine.system.System
 import akka.util.Timeout
@@ -20,10 +17,10 @@ import game.components.types.{Observer, Input}
 object QuitSystem {
   implicit val timeout = Timeout(1.second)
 
-  def props = Props(classOf[QuitSystem])
+  def props(tickInterval: FiniteDuration) = Props(classOf[QuitSystem], tickInterval)
 }
 
-class QuitSystem extends System {
+class QuitSystem(tickInterval: FiniteDuration) extends Actor {
 
   import QuitSystem.timeout
 
@@ -39,7 +36,7 @@ class QuitSystem extends System {
           yield e
         context.become(manage(v, es))
 
-      case Tick =>
+      case System.Tick =>
         val setOfFutures: Set[Future[Entity]] =
           entities.map {
             e =>
@@ -50,9 +47,13 @@ class QuitSystem extends System {
           }
 
         val futureSet: Future[Set[Entity]] = Future.sequence(setOfFutures)
-        for (set <- futureSet if (set.nonEmpty))
+        for (set <- futureSet if set.nonEmpty)
           context.parent ! Engine.Rem(version, set)
 
-        sender ! TickAck
+        context.system.scheduler.scheduleOnce(tickInterval, self, System.Tick)
     }
+
+  override def preStart() = {
+    self ! System.Tick
+  }
 }
