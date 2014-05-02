@@ -1,14 +1,16 @@
 package game.systems.connection
 
 import akka.actor._
+import scala.concurrent.duration._
 import akka.event.LoggingReceive
 import play.api.libs.iteratee.Enumerator
 import game.components.io.{ObserverComponent, InputComponent}
 import game.components.physics.{MobileComponent, DimensionComponent}
 import doppelengine.component.ComponentConfig
-import doppelengine.system.System.{UpdateAck, UpdateEntities}
+import doppelengine.system.System
+import doppelengine.system.System.UpdateEntities
 import akka.actor.Terminated
-import doppelengine.entity.EntityConfig
+import doppelengine.entity.{Entity, EntityConfig}
 import game.components.io.connection.PlayActorConnection
 import game.components.types._
 
@@ -27,13 +29,12 @@ object ConnectionSystem {
 
 }
 
-class ConnectionSystem extends Actor {
+class ConnectionSystem extends System(0.millis) {
 
   import ConnectionSystem._
 
   var connections: Map[String, ActorRef] = Map()
   var numConnections: Int = 0
-  var entityVersion: Long = 0
 
   def connectPlayer(username: String) = {
     val (enumerator, channel) = play.api.libs.iteratee.Concurrent.broadcast[String]
@@ -56,7 +57,7 @@ class ConnectionSystem extends Actor {
     )
 
     context.actorOf(
-      Helper.props(context.parent, connection, numConnections, entityVersion, configs),
+      Helper.props(context.parent, connection, numConnections, this.version, configs),
       s"helper$numConnections")
 
     sender ! Connected(connection, enumerator)
@@ -65,20 +66,20 @@ class ConnectionSystem extends Actor {
     context.watch(connection)
   }
 
-  override def receive: Receive = LoggingReceive {
-    case UpdateEntities(v, _) =>
-      entityVersion = v
-      sender ! UpdateAck(v)
+  override def updateEntities(entities: Set[Entity]): Unit = {}
+  override def onTick(): Unit = {}
 
-    case AddPlayer(username) if !connections.contains(username) =>
-      connectPlayer(username)
+  override def receive: Receive =
+    super.receive orElse LoggingReceive {
+      case AddPlayer(username) if !connections.contains(username) =>
+        connectPlayer(username)
 
-    case AddPlayer(username) =>
-      sender ! NotConnected(s"username '$username' already in use")
+      case AddPlayer(username) =>
+        sender ! NotConnected(s"username '$username' already in use")
 
-    case Terminated(conn) =>
-      connections = connections.filterNot {
-        case (usrName, actRef) => actRef == conn
-      }
-  }
+      case Terminated(conn) =>
+        connections = connections.filterNot {
+          case (usrName, actRef) => actRef == conn
+        }
+    }
 }

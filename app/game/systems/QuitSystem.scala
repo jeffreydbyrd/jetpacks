@@ -3,8 +3,7 @@ package game.systems
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import akka.actor.{Actor, Props, actorRef2Scala}
-import akka.event.LoggingReceive
+import akka.actor.{Props, actorRef2Scala}
 import akka.pattern.ask
 import doppelengine.component.Component
 import game.components.io.InputComponent.Snapshot
@@ -17,43 +16,33 @@ import game.components.types.{Observer, Input}
 object QuitSystem {
   implicit val timeout = Timeout(1.second)
 
-  def props(tickInterval: FiniteDuration) = Props(classOf[QuitSystem], tickInterval)
+  def props = Props[QuitSystem]
 }
 
-class QuitSystem(tickInterval: FiniteDuration) extends Actor {
+class QuitSystem extends System(200.millis) {
 
   import QuitSystem.timeout
 
   val requiredComponents = List(Input, Observer)
 
-  override def receive = manage(0, Set())
+  var entities: Set[Entity] = Set()
 
-  def manage(version: Long, entities: Set[Entity]): Receive =
-    LoggingReceive {
-      case System.UpdateEntities(v, ents) if v > version =>
-        val es =
-          for (e <- ents if e.hasComponents(requiredComponents))
-          yield e
-        context.become(manage(v, es))
+  override def updateEntities(ents: Set[Entity]): Unit =
+    entities =
+      ents.filter(_.hasComponents(requiredComponents))
 
-      case System.Tick =>
-        val setOfFutures: Set[Future[Entity]] =
-          entities.map {
-            e =>
-              (e(Input) ? Component.RequestSnapshot)
-                .mapTo[Snapshot]
-                .filter(_.quit)
-                .map(_ => e)
-          }
+  override def onTick(): Unit = {
+    val setOfFutures: Set[Future[Entity]] =
+      entities.map {
+        e =>
+          (e(Input) ? Component.RequestSnapshot)
+            .mapTo[Snapshot]
+            .filter(_.quit)
+            .map(_ => e)
+      }
 
-        val futureSet: Future[Set[Entity]] = Future.sequence(setOfFutures)
-        for (set <- futureSet if set.nonEmpty)
-          context.parent ! Engine.Rem(version, set)
-
-        context.system.scheduler.scheduleOnce(tickInterval, self, System.Tick)
-    }
-
-  override def preStart() = {
-    self ! System.Tick
+    val futureSet: Future[Set[Entity]] = Future.sequence(setOfFutures)
+    for (set <- futureSet if set.nonEmpty)
+      context.parent ! Engine.Rem(version, set)
   }
 }

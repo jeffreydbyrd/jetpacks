@@ -17,7 +17,7 @@ import game.components.types._
 object MyGame {
   private val sysConfigs: Set[SystemConfig] = Set(
     SystemConfig(ConnectionSystem.props, "connection_system"),
-    SystemConfig(QuitSystem.props(100.millis), "quit_system"),
+    SystemConfig(QuitSystem.props, "quit_system"),
     SystemConfig(VisualSystem.props, "visual_system"),
     SystemConfig(PhysicsSystem.props(0, -35), "physics_system")
   )
