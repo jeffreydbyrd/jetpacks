@@ -10,17 +10,17 @@ import doppelengine.component.Component.RequestSnapshot
 import game.components.physics.DimensionComponent
 import game.components.physics.MobileComponent
 import doppelengine.entity.Entity
-import doppelengine.system.SystemBehavior
+import doppelengine.system.System
 import game.components.io.InputComponent
 import game.components.physics.Shape
 import game.components.physics.Position
 import game.components.types._
 import akka.util.Timeout
 
-object PhysicsSystemBehavior {
+object PhysicsSystem {
   implicit val timeout = Timeout(1.second)
 
-  def props(gx: Int, gy: Int) = Props(classOf[PhysicsSystemBehavior], gx, gy)
+  def props(gx: Int, gy: Int) = Props(classOf[PhysicsSystem], gx, gy)
 
   trait Data
 
@@ -45,9 +45,9 @@ object PhysicsSystemBehavior {
     })
 }
 
-class PhysicsSystemBehavior(gx: Int, gy: Int) extends SystemBehavior {
+class PhysicsSystem(gx: Int, gy: Int) extends System(20.millis) {
 
-  import PhysicsSystemBehavior._
+  import PhysicsSystem._
 
   val mobileComponents = List(Input, Dimension, Mobility)
   val simulation = new Box2dSimulation(gx, gy)

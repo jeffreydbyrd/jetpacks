@@ -2,18 +2,23 @@ package game.systems
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import akka.pattern.ask
-import akka.pattern.pipe
+import scala.concurrent.duration._
+import akka.pattern.{ask,pipe}
 import doppelengine.component.Component
+import doppelengine.system.System
 import game.components.io.ObserverComponent
 import game.components.physics.DimensionComponent.Snapshot
 import doppelengine.core.Engine.timeout
 import doppelengine.entity.Entity
 import doppelengine.entity.EntityId
-import doppelengine.system.SystemBehavior
 import game.components.types.{Observer, Dimension}
+import akka.actor.Props
 
-class VisualSystemBehavior extends SystemBehavior {
+object VisualSystem {
+  def props = Props[VisualSystem]
+}
+
+class VisualSystem extends System(16.millis) {
 
   var clients: Set[Entity] = Set()
   var visuals: Set[Entity] = Set()

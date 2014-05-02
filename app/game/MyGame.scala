@@ -3,9 +3,8 @@ package game
 import akka.actor.{ActorRef, ActorSystem}
 
 import doppelengine.core.Engine
-import doppelengine.system.System
-import game.systems.{VisualSystemBehavior, QuitSystem}
-import game.systems.physics.PhysicsSystemBehavior
+import game.systems.{VisualSystem, QuitSystem}
+import game.systems.physics.PhysicsSystem
 import game.components.physics.DimensionComponent
 import doppelengine.component.{ComponentType, ComponentConfig}
 import scala.concurrent.duration._
@@ -19,8 +18,8 @@ object MyGame {
   private val sysConfigs: Set[SystemConfig] = Set(
     SystemConfig(ConnectionSystem.props, "connection_system"),
     SystemConfig(QuitSystem.props(100.millis), "quit_system"),
-    System.config(new VisualSystemBehavior, 16.millis, "visual_system"),
-    System.config(new PhysicsSystemBehavior(0, -35), 20.millis, "physics_system")
+    SystemConfig(VisualSystem.props, "visual_system"),
+    SystemConfig(PhysicsSystem.props(0, -35), "physics_system")
   )
 
   private val walls: Set[(ComponentType, ComponentConfig)] = Set(

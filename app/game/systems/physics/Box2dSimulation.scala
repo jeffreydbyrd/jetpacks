@@ -7,8 +7,8 @@ import org.jbox2d.dynamics.Body
 import org.jbox2d.dynamics.World
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.BodyType
-import game.systems.physics.PhysicsSystemBehavior.MobileData
-import game.systems.physics.PhysicsSystemBehavior.StructData
+import game.systems.physics.PhysicsSystem.MobileData
+import game.systems.physics.PhysicsSystem.StructData
 import game.components.physics.Rect
 import doppelengine.entity.Entity
 import game.components.io.InputComponent
