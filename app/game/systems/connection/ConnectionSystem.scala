@@ -40,16 +40,16 @@ class ConnectionSystem extends System(0.millis) {
     val (enumerator, channel) = play.api.libs.iteratee.Concurrent.broadcast[String]
 
     val connection =
-      context.actorOf(PlayActorConnection.props(channel), s"conn$numConnections")
+      context.actorOf(PlayActorConnection.props(channel), s"conn-$numConnections")
 
     val input =
-      new ComponentConfig(InputComponent.props, s"input_plr$numConnections")
+      new ComponentConfig(InputComponent.props, s"input-$numConnections")
     val observer =
-      new ComponentConfig(ObserverComponent.props, s"observer_plr$numConnections")
+      new ComponentConfig(ObserverComponent.props, s"observer-$numConnections")
     val dimensions =
-      new ComponentConfig(DimensionComponent.props(10, 10, 2, 2), s"dimensions_plr$numConnections")
+      new ComponentConfig(DimensionComponent.props(10, 10, 2, 2), s"dimensions-$numConnections")
     val mobility =
-      new ComponentConfig(MobileComponent.props(20, 20F), s"mobile_plr$numConnections")
+      new ComponentConfig(MobileComponent.props(20, 20F), s"mobile-$numConnections")
 
     val configs: EntityConfig = Map(
       Input -> input, Observer -> observer,

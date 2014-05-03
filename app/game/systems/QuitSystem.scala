@@ -32,17 +32,19 @@ class QuitSystem extends System(200.millis) {
       ents.filter(_.hasComponents(requiredComponents))
 
   override def onTick(): Unit = {
-    val setOfFutures: Set[Future[Entity]] =
+    val setOfFutures: Set[Future[(Entity, Snapshot)]] =
       entities.map {
         e =>
           (e(Input) ? Component.RequestSnapshot)
             .mapTo[Snapshot]
-            .filter(_.quit)
-            .map(_ => e)
+            .map((e, _))
       }
 
-    val futureSet: Future[Set[Entity]] = Future.sequence(setOfFutures)
-    for (set <- futureSet if set.nonEmpty)
-      context.parent ! Engine.Rem(version, set)
+    val futureSet: Future[Set[(Entity, Snapshot)]] = Future.sequence(setOfFutures)
+
+    for (set <- futureSet) {
+      val quitters = set.filter(_._2.quit).map(_._1)
+      if (quitters.nonEmpty) context.parent ! Engine.Rem(version, quitters)
+    }
   }
 }

@@ -16,10 +16,10 @@ import game.components.types._
 
 object MyGame {
   private val sysConfigs: Set[SystemConfig] = Set(
-    SystemConfig(ConnectionSystem.props, "connection_system"),
-    SystemConfig(QuitSystem.props, "quit_system"),
-    SystemConfig(VisualSystem.props, "visual_system"),
-    SystemConfig(PhysicsSystem.props(0, -35), "physics_system")
+    SystemConfig(ConnectionSystem.props, "connection-system"),
+    SystemConfig(QuitSystem.props, "quit-system"),
+    SystemConfig(VisualSystem.props, "visual-system"),
+    SystemConfig(PhysicsSystem.props(0, -35), "physics-system")
   )
 
   private val walls: Set[(ComponentType, ComponentConfig)] = Set(
@@ -40,7 +40,7 @@ object MyGame {
 
   val connectionSystem = {
     val fConnSystem: Future[ActorRef] =
-      actorSystem.actorSelection(doppelengine.path / "connection_system").resolveOne
+      actorSystem.actorSelection(doppelengine.path / "connection-system").resolveOne
     Await.result(fConnSystem, 1000 millis)
   }
 }

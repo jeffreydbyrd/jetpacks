@@ -55,38 +55,28 @@ class PhysicsSystem(gx: Int, gy: Int) extends System(20.millis) {
   var structures: Set[Entity] = Set()
   var mobiles: Set[Entity] = Set()
 
-  def updateEntities(addStructs: Set[Future[StructData]],
-                     addMobiles: Set[Future[MobileData]],
-                     remMobiles: Set[Future[MobileData]]) = {
-    for (futureStruct <- addStructs)
-      simulation.add(Await.result(futureStruct, 1000 millis))
-
-    for (futureMobile <- addMobiles) {
-      val data = Await.result(futureMobile, 1000 millis)
-      simulation.createMobile(data)
-    }
-
-    for (futureMobile <- remMobiles) {
-      val data: MobileData = Await.result(futureMobile, 1000 millis)
-      simulation.rem(data.e)
-    }
-  }
-
   override def updateEntities(ents: Set[Entity]) = {
     var newStructs: Set[Entity] = Set()
     var newMobiles: Set[Entity] = Set()
 
     for (e <- ents) {
-      if (e.hasComponents(mobileComponents)) newMobiles += e
       val comps = e.components
-      if (comps.contains(Dimension) && !comps.contains(Mobility))
-        newStructs += e
+      if (e.hasComponents(mobileComponents)) newMobiles += e
+      else if (comps.contains(Dimension)) newStructs += e
     }
 
-    updateEntities(
-      getStructData(newStructs -- structures),
-      getMobileData(newMobiles -- mobiles),
-      getMobileData(mobiles -- newMobiles))
+    // delete mobiles
+    for (e <- mobiles -- newMobiles) simulation.rem(e)
+
+    // add mobiles
+    for (futureMobile <- getMobileData(newMobiles -- mobiles)) {
+      val data = Await.result(futureMobile, 1000 millis)
+      simulation.createMobile(data)
+    }
+
+    // add structures
+    for (futureStruct <- getStructData(newStructs -- structures))
+      simulation.add(Await.result(futureStruct, 1000 millis))
 
     structures = newStructs
     mobiles = newMobiles
