@@ -7,7 +7,7 @@ import akka.actor.{Props, ActorSystem}
 import akka.util.Timeout
 import scala.concurrent.duration._
 import org.scalatest.{MustMatchers, FunSuiteLike, BeforeAndAfterAll}
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsString, JsObject, Json, JsValue}
 import play.api.libs.iteratee.Iteratee
 import game.components.io.ClientCommand.ServerQuit
 
@@ -19,10 +19,10 @@ class PlayActorConnectionSpec
 
   implicit val timeout: Timeout = 1.second
 
-  val ackMessage = """{ "data" : 0, "type":"ack" }"""
+  val ackMessage = Json.obj("data" -> 0, "type" -> "ack")
 
   test("Retain any ActorRef I send it as a 'server actor'") {
-    val (_, channel) = play.api.libs.iteratee.Concurrent.broadcast[String]
+    val (_, channel) = play.api.libs.iteratee.Concurrent.broadcast[JsValue]
     val server = TestProbe()
     val connection = TestActorRef[PlayActorConnection](Props(classOf[PlayActorConnection], channel))
     connection ! server.ref
@@ -31,21 +31,21 @@ class PlayActorConnectionSpec
   }
 
   test("Parse and forward all JSON messages to the server actor as JsValues") {
-    val (_, channel) = play.api.libs.iteratee.Concurrent.broadcast[String]
+    val (_, channel) = play.api.libs.iteratee.Concurrent.broadcast[JsValue]
     val server = TestProbe()
     val connection = TestActorRef(Props(classOf[PlayActorConnection], channel))
     connection ! server.ref
 
-    val message = """{ "type":"whatever", "data" : "whatever" }"""
+    val message = Json.obj("type" -> "whatever", "data" -> "whatever")
     connection ! message
     server.expectMsgClass(classOf[JsValue])
   }
 
   test("Forward all ClientCommand messages to the channel") {
-    val (enum, channel) = play.api.libs.iteratee.Concurrent.broadcast[String]
+    val (enum, channel) = play.api.libs.iteratee.Concurrent.broadcast[JsValue]
 
     val probe = TestProbe()
-    enum(Iteratee.foreach[String] {
+    enum(Iteratee.foreach[JsValue] {
       probe.ref ! _
     })
 
@@ -54,16 +54,16 @@ class PlayActorConnectionSpec
     connection ! server.ref
 
     connection ! ServerQuit
-    probe.expectMsgPF() {
-      case s: String if s.contains( """"type": "quit"""") => s
-    }
+    probe.expectMsgPF()({
+      case json:JsObject if json \ "type" == JsString("quit") => json
+    })
   }
 
   test("Retry important messages until client responds with an ack message") {
-    val (enum, channel) = play.api.libs.iteratee.Concurrent.broadcast[String]
+    val (enum, channel) = play.api.libs.iteratee.Concurrent.broadcast[JsValue]
 
     val probe = TestProbe()
-    enum(Iteratee.foreach[String] {
+    enum(Iteratee.foreach[JsValue] {
       probe.ref ! _
     })
 
@@ -74,17 +74,15 @@ class PlayActorConnectionSpec
     connection ! TestCommand
     connection.underlyingActor.retryers.contains(0) mustBe true
 
-    probe.expectMsgPF(500 millis) {
-      case s: String if s.contains( """"type": "test""") => s
-    }
-
-    probe.expectMsgPF(500 millis) {
-      case s: String if s.contains( """"type": "test""") => s
-    }
-
-    probe.expectMsgPF(500 millis) {
-      case s: String if s.contains( """"type": "test""") => s
-    }
+    probe.expectMsgPF()({
+      case json:JsObject if (json \ "type") == JsString("test") => json
+    })
+    probe.expectMsgPF()({
+      case json:JsObject if json \ "type" == JsString("test") => json
+    })
+    probe.expectMsgPF()({
+      case json:JsObject if json \ "type" == JsString("test") => json
+    })
 
     connection ! ackMessage
     connection.underlyingActor.retryers.contains(0) mustBe false

@@ -10,13 +10,13 @@ import akka.event.LoggingReceive
 import play.api.libs.iteratee.Concurrent.Channel
 import play.api.libs.iteratee.Enumerator
 import game.components.io.{ClientCommand, ServerCommand}
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import ClientCommand.ServerQuit
 
 object PlayActorConnection {
   type MessageId = Long
 
-  def props(channel: Channel[String]) = Props(classOf[PlayActorConnection], channel)
+  def props(channel: Channel[JsValue]) = Props(classOf[PlayActorConnection], channel)
 
   // Received Messages
   case object GetEnum
@@ -28,7 +28,7 @@ object PlayActorConnection {
 
 }
 
-class PlayActorConnection(val toClient: Channel[String]) extends Actor {
+class PlayActorConnection(val toClient: Channel[JsValue]) extends Actor {
 
   import PlayActorConnection._
 
@@ -36,17 +36,18 @@ class PlayActorConnection(val toClient: Channel[String]) extends Actor {
   var seq: MessageId = 0
   var retryers: Map[MessageId, ActorRef] = Map()
 
-  def retry(msg: String) {
+  def retry(msg: JsValue) {
     val prop = Retryer.props(msg, toClient)
-    retryers += seq -> context.actorOf(prop, "retryer_" + seq.toString)
+    retryers += seq -> context.actorOf(prop, "retryer-" + seq.toString)
   }
 
   def send(cc: ClientCommand) = {
-    val msg =
-      s""" {"seq" : $seq,
-            "ack":${cc.doRetry},
-            "type": "${cc.typ}",
-    	      "message" : ${cc.toJson}} """
+    val msg = Json.obj(
+      "seq" -> seq,
+      "ack" -> cc.doRetry,
+      "type" -> cc.typ,
+      "message" -> cc.toJson
+    )
     toClient.push(msg)
     if (cc.doRetry) {
       retry(msg)
@@ -66,12 +67,11 @@ class PlayActorConnection(val toClient: Channel[String]) extends Actor {
   }
 
   override def receive = LoggingReceive {
-    case s: String if toServer.isDefined =>
-      val parsed: JsValue = Json.parse(s)
-      val data = parsed \ "data"
-      (parsed \ "type").as[String] match {
+    case json: JsObject if toServer.isDefined =>
+      val data = json \ "data"
+      (json \ "type").as[String] match {
         case "ack" => ack(data.as[Int])
-        case _ => toServer.get ! parsed
+        case _ => toServer.get ! json
       }
 
     case cc: ClientCommand => send(cc)

@@ -9,6 +9,7 @@ import play.api.mvc._
 import akka.util.Timeout
 import play.api.libs.iteratee.{Enumerator, Input, Done, Iteratee}
 import game.MyGame
+import play.api.libs.json.JsValue
 
 object PlayController extends Controller {
   import play.Logger
@@ -29,20 +30,20 @@ object PlayController extends Controller {
    * In this case, we ask the engine to add a Player with username, and the engine sends back an Enumerator
    * and an ActorRef, which our Iteratee[String] forwards all incoming data to.
    */
-  def websocket(username: String) = WebSocket.async[String] {
+  def websocket(username: String) = WebSocket.async[JsValue] {
     implicit request =>
       Logger.info(s"$username requested WebSocket connection")
       (MyGame.connectionSystem ? AddPlayer(username)) map {
 
         case ConnectionSystem.Connected(connection, enumerator) => // Success
-          val iter = Iteratee.foreach[String] {
+          val iter = Iteratee.foreach[JsValue] {
             connection ! _
           }
           (iter, enumerator)
 
         case ConnectionSystem.NotConnected(message) => // Connection error
-          val iter = Done[String, Unit]((), Input.EOF)
-          val enum = Enumerator[String](message).andThen(Enumerator.enumInput(Input.EOF))
+          val iter = Done[JsValue, Unit]((), Input.EOF)
+          val enum = Enumerator[JsValue](message).andThen(Enumerator.enumInput(Input.EOF))
           (iter, enum)
       }
   }

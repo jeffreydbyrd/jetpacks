@@ -2,17 +2,16 @@ package game.systems.connection
 
 import akka.actor._
 import scala.concurrent.duration._
-import akka.event.LoggingReceive
 import play.api.libs.iteratee.Enumerator
 import game.components.io.{ObserverComponent, InputComponent}
 import game.components.physics.{MobileComponent, DimensionComponent}
 import doppelengine.component.ComponentConfig
 import doppelengine.system.System
-import doppelengine.system.System.UpdateEntities
 import akka.actor.Terminated
 import doppelengine.entity.{Entity, EntityConfig}
 import game.components.io.connection.PlayActorConnection
 import game.components.types._
+import play.api.libs.json.{Json, JsValue}
 
 object ConnectionSystem {
   def props = Props(classOf[ConnectionSystem])
@@ -23,9 +22,9 @@ object ConnectionSystem {
   // sent
   case object Connect
 
-  case class Connected(connection: ActorRef, enum: Enumerator[String])
+  case class Connected(connection: ActorRef, enum: Enumerator[JsValue])
 
-  case class NotConnected(message: String)
+  case class NotConnected(message: JsValue)
 
 }
 
@@ -37,7 +36,7 @@ class ConnectionSystem extends System(0.millis) {
   var numConnections: Int = 0
 
   def connectPlayer(username: String) = {
-    val (enumerator, channel) = play.api.libs.iteratee.Concurrent.broadcast[String]
+    val (enumerator, channel) = play.api.libs.iteratee.Concurrent.broadcast[JsValue]
 
     val connection =
       context.actorOf(PlayActorConnection.props(channel), s"conn-$numConnections")
@@ -58,7 +57,7 @@ class ConnectionSystem extends System(0.millis) {
 
     context.actorOf(
       Helper.props(context.parent, connection, numConnections, this.version, configs),
-      s"helper$numConnections")
+      s"helper-$numConnections")
 
     sender ! Connected(connection, enumerator)
     numConnections += 1
@@ -67,15 +66,16 @@ class ConnectionSystem extends System(0.millis) {
   }
 
   override def updateEntities(entities: Set[Entity]): Unit = {}
+
   override def onTick(): Unit = {}
 
   override def receive: Receive =
-    super.receive orElse LoggingReceive {
+    super.receive orElse {
       case AddPlayer(username) if !connections.contains(username) =>
         connectPlayer(username)
 
       case AddPlayer(username) =>
-        sender ! NotConnected(s"username '$username' already in use")
+        sender ! NotConnected(Json.obj("error" -> s"username '$username' already in use"))
 
       case Terminated(conn) =>
         connections = connections.filterNot {
