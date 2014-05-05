@@ -15,6 +15,9 @@ import doppelengine.entity.EntityConfig
 import game.components.types._
 
 object MyGame {
+
+  val numPlayers = 2
+
   private val sysConfigs: Set[SystemConfig] = Set(
     SystemConfig(ConnectionSystem.props, "connection-system"),
     SystemConfig(QuitSystem.props, "quit-system"),

@@ -37,7 +37,7 @@ object ClientCommand {
 
   case class UpdatePositions(positions: Map[String, (Float, Float)],
                              override val doRetry: Boolean = false) extends ClientCommand {
-    override val typ = "update_positions"
+    override val typ = "update-positions"
 
     override val toJson = {
       var json = Json.obj()

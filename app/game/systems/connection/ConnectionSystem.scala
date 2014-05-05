@@ -12,6 +12,7 @@ import doppelengine.entity.{Entity, EntityConfig}
 import game.components.io.connection.PlayActorConnection
 import game.components.types._
 import play.api.libs.json.{Json, JsValue}
+import game.MyGame
 
 object ConnectionSystem {
   def props = Props(classOf[ConnectionSystem])
@@ -71,11 +72,13 @@ class ConnectionSystem extends System(0.millis) {
 
   override def receive: Receive =
     super.receive orElse {
-      case AddPlayer(username) if !connections.contains(username) =>
-        connectPlayer(username)
-
       case AddPlayer(username) =>
-        sender ! NotConnected(Json.obj("error" -> s"username '$username' already in use"))
+        if (connections.contains(username))
+          sender ! NotConnected(Json.obj("error" -> s"username '$username' already in use"))
+        else if (connections.size == MyGame.numPlayers)
+          sender ! NotConnected(Json.obj("error" -> "Max players already reached"))
+        else
+          connectPlayer(username)
 
       case Terminated(conn) =>
         connections = connections.filterNot {
