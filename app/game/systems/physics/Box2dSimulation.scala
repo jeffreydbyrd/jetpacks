@@ -45,8 +45,8 @@ class Box2dSimulation( gx: Int, gy: Int ) {
     else if ( snap.left ) m.setSpeed( -m.speed )
     else if ( snap.right ) m.setSpeed( m.speed )
 
-    if (m.grounded && snap.jump) m.jump()
-    else if (snap.jump) m.boost()
+    if (m.grounded && snap.up) m.jump()
+    else if (snap.up) m.boost()
   }
 
   def step() = {

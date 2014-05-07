@@ -1,5 +1,6 @@
 function Commands() {
-  this.jump = "JUMP";
+  this.jump = "UP";
+  this.down = "DOWN";
   this.left = "LEFT";
   this.right = "RIGHT";
   this.quit = "QUIT";
@@ -8,6 +9,7 @@ function Commands() {
     32:this.jump, 38:this.jump, 87:this.jump,
     65:this.left, 37:this.left,
     68:this.right, 39:this.right,
+    40:this.down, 83:this.down,
     81:this.quit
   };
 }

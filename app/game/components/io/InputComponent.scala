@@ -12,7 +12,8 @@ object InputComponent {
   // Sent
   case class Snapshot(left: Boolean,
                       right: Boolean,
-                      jump: Boolean,
+                      up: Boolean,
+                      down: Boolean,
                       quit: Boolean)
 
 }
@@ -24,12 +25,14 @@ class InputComponent extends Component {
 
   var left = false
   var right = false
-  var jump = false
+  var up = false
+  var down = false
   var quit = false
 
   def exec(cmd: ServerCommand) = cmd match {
-    case Jump => jump = true
-    case StopJump => jump = false
+    case Up => up = true
+    case Down => down = true
+    case StopUp => up = false
     case GoLeft => left = true
     case GoRight => right = true
     case StopLeft => left = false
@@ -40,6 +43,6 @@ class InputComponent extends Component {
   override def receive = LoggingReceive {
     case json: JsValue => exec(ServerCommand.getCommand(json))
     case RequestSnapshot =>
-      sender ! Snapshot(left, right, jump, quit)
+      sender ! Snapshot(left, right, up, down, quit)
   }
 }

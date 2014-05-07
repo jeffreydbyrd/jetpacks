@@ -13,10 +13,12 @@ object ServerCommand {
     (json \ "type").as[String] match {
       case "LEFT" => GoLeft
       case "RIGHT" => GoRight
-      case "JUMP" => Jump
-      case "STOP_LEFT" => StopLeft
-      case "STOP_RIGHT" => StopRight
-      case "STOP_JUMP" => StopJump
+      case "UP" => Up
+      case "DOWN" => Down
+      case "STOP-LEFT" => StopLeft
+      case "STOP-RIGHT" => StopRight
+      case "STOP-UP" => StopUp
+      case "STOP-DOWN" => StopDown
       case "QUIT" => ClientQuit
       case "click" =>
         val x = (data \ "x").as[Int]
@@ -33,15 +35,19 @@ case object ClientQuit extends ServerCommand
 
 case class Click(x: Int, y: Int) extends ServerCommand
 
-case object Jump extends ServerCommand
+case object Up extends ServerCommand
+
+case object Down extends ServerCommand
 
 case object GoLeft extends ServerCommand
 
 case object GoRight extends ServerCommand
 
-case object StopJump extends ServerCommand
+case object StopUp extends ServerCommand
 
 case object StopLeft extends ServerCommand
+
+case object StopDown extends ServerCommand
 
 case object StopRight extends ServerCommand
 
