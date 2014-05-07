@@ -4,7 +4,6 @@ import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.iteratee.Enumerator
 import game.components.io.{ObserverComponent, InputComponent}
-import game.components.physics.{MobileComponent, DimensionComponent}
 import doppelengine.component.ComponentConfig
 import doppelengine.system.System
 import akka.actor.Terminated
@@ -16,6 +15,17 @@ import game.MyGame
 
 object ConnectionSystem {
   def props = Props(classOf[ConnectionSystem])
+
+  private def err(msg: String): NotConnected = {
+    NotConnected(
+      Json.obj(
+        "seq" -> 0,
+        "ack" -> false,
+        "type" -> "error",
+        "message" -> msg
+      )
+    )
+  }
 
   // received
   case class AddPlayer(name: String)
@@ -46,14 +56,9 @@ class ConnectionSystem extends System(0.millis) {
       new ComponentConfig(InputComponent.props, s"input-$numConnections")
     val observer =
       new ComponentConfig(ObserverComponent.props, s"observer-$numConnections")
-    val dimensions =
-      new ComponentConfig(DimensionComponent.props(10, 10, 2, 2), s"dimensions-$numConnections")
-    val mobility =
-      new ComponentConfig(MobileComponent.props(20, 20F), s"mobile-$numConnections")
 
     val configs: EntityConfig = Map(
-      Input -> input, Observer -> observer,
-      Dimension -> dimensions, Mobility -> mobility
+      Input -> input, Observer -> observer
     )
 
     context.actorOf(
@@ -74,9 +79,9 @@ class ConnectionSystem extends System(0.millis) {
     super.receive orElse {
       case AddPlayer(username) =>
         if (connections.contains(username))
-          sender ! NotConnected(Json.obj("error" -> s"username '$username' already in use"))
+          sender ! err(s"username '$username' already in use")
         else if (connections.size == MyGame.numPlayers)
-          sender ! NotConnected(Json.obj("error" -> "Max players already reached"))
+          sender ! err("Max players already reached")
         else
           connectPlayer(username)
 

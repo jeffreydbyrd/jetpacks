@@ -40,9 +40,9 @@ class VisualSystem extends System(16.millis) {
         case snap: Snapshot => (v.id, snap)
       })
 
-    val futureSet: Future[ObserverComponent.Update] =
+    val futureSet: Future[ObserverComponent.UpdateEntities] =
       Future.sequence(setOfFutures).map {
-        ObserverComponent.Update
+        ObserverComponent.UpdateEntities
       }
 
     for (c <- clients) futureSet.pipeTo(c(Observer))

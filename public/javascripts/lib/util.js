@@ -74,6 +74,19 @@ UTIL.filter = function(arr, p) {
 	return builder;
 }
 
+UTIL.foldLeft = function(arr, init) {
+  return function(f) {
+    if (arr.length == 0) {
+      return init;
+    }
+    var accum = f(init, arr[0]);
+    for(var i = 1; i < arr.length; i++) {
+      accum = f(accum, arr[i]);
+    }
+    return accum;
+  }
+}
+
 UTIL.reduce = function(arr, f) {
   if (arr.length == 0) {
     throw new TypeError("Reduce of empty array with no initial value");

@@ -10,25 +10,26 @@ import akka.util.Timeout
 import play.api.libs.iteratee.{Enumerator, Input, Done, Iteratee}
 import game.MyGame
 import play.api.libs.json.JsValue
+import scala.concurrent.Future
 
 object PlayController extends Controller {
+
   import play.Logger
+
   implicit val timeout = Timeout(1.second)
 
   /** Serves the main page */
   def index = Action {
-    Ok {
-      views.html.index()
-    }
+    Ok(views.html.index())
   }
 
   /**
-   * WebSocket.async[String] expects a function Request => (Iteratee[String], Enumerator[String]), where the
-   * Iteratee[String] handles incoming messages from the client, and the Enumerator[String] pushes messages
+   * WebSocket.async[JsValue] expects a function Request => (Iteratee[JsValue], Enumerator[JsValue]), where the
+   * Iteratee[JsValue] handles incoming messages from the client, and the Enumerator[JsValue] pushes messages
    * to the client. Play will wire everything else together for us.
    *
    * In this case, we ask the engine to add a Player with username, and the engine sends back an Enumerator
-   * and an ActorRef, which our Iteratee[String] forwards all incoming data to.
+   * and an ActorRef, which our Iteratee[JsValue] forwards all incoming data to.
    */
   def websocket(username: String) = WebSocket.async[JsValue] {
     implicit request =>

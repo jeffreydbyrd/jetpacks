@@ -8,12 +8,15 @@ import akka.event.LoggingReceive
 import doppelengine.component.Component
 import game.components.physics.DimensionComponent
 import doppelengine.entity.EntityId
+import game.components.startscreen.ReadyComponent
 
 object ObserverComponent {
   val props = Props(classOf[ObserverComponent])
 
   // received
-  case class Update(snaps: Set[(EntityId, DimensionComponent.Snapshot)])
+  case class UpdateEntities(snaps: Set[(EntityId, DimensionComponent.Snapshot)])
+
+  case class UpdateReadyMenu(snaps: Set[(EntityId, ReadyComponent.Snapshot)])
 
 }
 
@@ -27,7 +30,7 @@ class ObserverComponent extends Component {
   var snapshots: Map[EntityId, DimensionComponent.Snapshot] = Map()
 
   override def receive = LoggingReceive {
-    case Update(snaps) if connection.isDefined =>
+    case UpdateEntities(snaps) if connection.isDefined =>
       val Some(conn) = connection
       for ((id, snap) <- snaps if !snapshots.contains(id))
         conn ! ClientCommand.CreateRect(id.toString, snap.pos, snap.shape)

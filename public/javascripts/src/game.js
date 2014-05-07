@@ -16,6 +16,18 @@ function Game(canvasX, canvasY, kx, ky) {
   function convertXPos(x) { return x * kx }
   function convertYPos(y){ return canvasY - (y * ky) }
 
+  self.updateIntro(players) {
+    var text = "Waiting on players\n\n";
+
+    for(i in players) {
+      text = text + players[i].name + "... " + players[i].status + "\n";
+    }
+
+    var sprite = new PIXI.Text(text, {font:"24px Arial"});
+    entities["intro"] = sprite;
+    stage.addChild(sprite);
+  };
+
   self.create = function(id, x, y, w, h) {
     var texture = PIXI.Texture.fromImage("/assets/images/black.png");
 
@@ -55,8 +67,12 @@ function Game(canvasX, canvasY, kx, ky) {
 
     conn.onReceive("quit", function(params) {
       conn.close();
-      document.write("<p>later!</p>");
+      document.write("<p>I enjoyed our time together!</p>");
     });
 
+    conn.onReceive("error", function(message) {
+      conn.close();
+      document.write("<p>Unable to connect: " + message + "</p>");
+    });
   };
 }
