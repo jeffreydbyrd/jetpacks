@@ -7,11 +7,11 @@ import akka.actor.{Props, actorRef2Scala}
 import akka.pattern.ask
 import doppelengine.component.Component
 import game.components.io.InputComponent.Snapshot
-import doppelengine.core.Engine
+import doppelengine.core.RemoveEntities
 import doppelengine.entity.Entity
 import doppelengine.system.System
 import akka.util.Timeout
-import game.components.types.{Observer, Input}
+import game.components.types.Input
 
 object QuitSystem {
   implicit val timeout = Timeout(1.second)
@@ -23,7 +23,7 @@ class QuitSystem extends System(200.millis) {
 
   import QuitSystem.timeout
 
-  val requiredComponents = List(Input, Observer)
+  val requiredComponents = List(Input)
 
   var entities: Set[Entity] = Set()
 
@@ -44,7 +44,7 @@ class QuitSystem extends System(200.millis) {
 
     for (set <- futureSet) {
       val quitters = set.filter(_._2.quit).map(_._1)
-      if (quitters.nonEmpty) context.parent ! Engine.Rem(version, quitters)
+      if (quitters.nonEmpty) context.parent ! RemoveEntities(version, quitters)
     }
   }
 }

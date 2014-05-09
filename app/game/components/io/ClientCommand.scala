@@ -2,7 +2,7 @@ package game.components.io
 
 import game.components.physics.Rect
 import game.components.physics.Position
-import play.api.libs.json.{JsNull, JsValue, Json}
+import play.api.libs.json.{JsArray, JsNull, JsValue, Json}
 
 /**
  * A Command that goes to the Client (ie. the browser)
@@ -41,8 +41,10 @@ object ClientCommand {
 
     override val toJson = {
       var json = Json.obj()
+
       for ((id, (x, y)) <- positions)
         json += (id -> Json.arr(x, y))
+
       json
     }
   }
@@ -57,6 +59,22 @@ object ClientCommand {
       "id" -> id,
       "position" -> Json.arr(x, y)
     )
+  }
+
+  case class UpdateIntro(statuses: Map[String, Boolean]) extends ClientCommand {
+    override val typ: String = "update-intro"
+
+    override val doRetry: Boolean = false
+
+    override val toJson: JsValue = {
+      var json = Json.arr()
+
+      for ((name, isReady) <- statuses)
+        json = json :+ Json.obj("name" -> name, "isReady" -> isReady)
+
+      json
+    }
+
   }
 
 }

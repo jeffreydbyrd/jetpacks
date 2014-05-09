@@ -3,9 +3,10 @@ function Game(canvasX, canvasY, kx, ky) {
 
   var stage = new PIXI.Stage(0xFFFFFF);
   var renderer = PIXI.autoDetectRenderer(canvasX, canvasY);
-  var entities = {};
 
   document.body.appendChild(renderer.view);
+
+  var entities = {};
 
   requestAnimFrame( animate );
   function animate() {
@@ -16,16 +17,21 @@ function Game(canvasX, canvasY, kx, ky) {
   function convertXPos(x) { return x * kx }
   function convertYPos(y){ return canvasY - (y * ky) }
 
-  self.updateIntro(players) {
-    var text = "Waiting on players\n\n";
+  var intro = null;
+  self.updateIntro = function(statuses) {
+    var text = "Waiting on players\nPress enter when ready\n\n";
 
-    for(i in players) {
-      text = text + players[i].name + "... " + players[i].status + "\n";
+    for(i in statuses) {
+      var status = statuses[i].isReady ? "ready" : "waiting";
+      text = text + statuses[i].name + "... " + status + "\n";
     }
 
-    var sprite = new PIXI.Text(text, {font:"24px Arial"});
-    entities["intro"] = sprite;
-    stage.addChild(sprite);
+    if (intro != null) {
+      stage.removeChild(intro);
+    }
+
+    intro = new PIXI.Text(text, {font:"24px Arial"});
+    stage.addChild(intro);
   };
 
   self.create = function(id, x, y, w, h) {
@@ -63,6 +69,10 @@ function Game(canvasX, canvasY, kx, ky) {
                   convertXPos(params[id][0]),
                   convertYPos(params[id][1]) );
       }
+    });
+
+    conn.onReceive("update-intro", function(params){
+      self.updateIntro(params);
     });
 
     conn.onReceive("quit", function(params) {

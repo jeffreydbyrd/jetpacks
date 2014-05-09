@@ -3,7 +3,7 @@ package game.systems.connection
 import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.iteratee.Enumerator
-import game.components.io.{ObserverComponent, InputComponent}
+import game.components.io.{GamePlayObserverComponent, InputComponent}
 import doppelengine.component.ComponentConfig
 import doppelengine.system.System
 import akka.actor.Terminated
@@ -12,6 +12,7 @@ import game.components.io.connection.PlayActorConnection
 import game.components.types._
 import play.api.libs.json.{Json, JsValue}
 import game.MyGame
+import game.components.startscreen.{ReadyComponent, TitleObserverComponent}
 
 object ConnectionSystem {
   def props = Props(classOf[ConnectionSystem])
@@ -55,14 +56,16 @@ class ConnectionSystem extends System(0.millis) {
     val input =
       new ComponentConfig(InputComponent.props, s"input-$numConnections")
     val observer =
-      new ComponentConfig(ObserverComponent.props, s"observer-$numConnections")
+      new ComponentConfig(TitleObserverComponent.props, s"observer-$numConnections")
+    val ready =
+      new ComponentConfig(ReadyComponent.props, s"ready-$numConnections")
 
-    val configs: EntityConfig = Map(
-      Input -> input, Observer -> observer
+    val config: EntityConfig = Map(
+      Input -> input, TitleObserver -> observer, Ready -> ready
     )
 
     context.actorOf(
-      Helper.props(context.parent, connection, numConnections, this.version, configs),
+      Helper.props(context.parent, connection, numConnections, this.version, config),
       s"helper-$numConnections")
 
     sender ! Connected(connection, enumerator)

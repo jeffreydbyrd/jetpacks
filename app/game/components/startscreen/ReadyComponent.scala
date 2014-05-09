@@ -1,13 +1,16 @@
 package game.components.startscreen
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 import doppelengine.component.Component.RequestSnapshot
 import game.components.startscreen.ReadyComponent.Snapshot
 
 object ReadyComponent {
 
+  val props = Props[ReadyComponent]
+
   // Sent
   case class Snapshot(isRead: Boolean)
+
 }
 
 class ReadyComponent extends Actor {

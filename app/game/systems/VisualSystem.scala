@@ -6,12 +6,12 @@ import scala.concurrent.duration._
 import akka.pattern.{ask,pipe}
 import doppelengine.component.Component
 import doppelengine.system.System
-import game.components.io.ObserverComponent
+import game.components.io.GamePlayObserverComponent
 import game.components.physics.DimensionComponent.Snapshot
 import doppelengine.core.Engine.timeout
 import doppelengine.entity.Entity
 import doppelengine.entity.EntityId
-import game.components.types.{Observer, Dimension}
+import game.components.types.{GamePlayObserver, Dimension}
 import akka.actor.Props
 
 object VisualSystem {
@@ -28,7 +28,7 @@ class VisualSystem extends System(16.millis) {
     var newVisuals: Set[Entity] = Set()
     for (e <- entities) {
       if (e.components.contains(Dimension)) newVisuals += e
-      if (e.components.contains(Observer)) newClients += e
+      if (e.components.contains(GamePlayObserver)) newClients += e
     }
     clients = newClients
     visuals = newVisuals
@@ -40,11 +40,11 @@ class VisualSystem extends System(16.millis) {
         case snap: Snapshot => (v.id, snap)
       })
 
-    val futureSet: Future[ObserverComponent.UpdateEntities] =
+    val futureSet: Future[GamePlayObserverComponent.UpdateEntities] =
       Future.sequence(setOfFutures).map {
-        ObserverComponent.UpdateEntities
+        GamePlayObserverComponent.UpdateEntities
       }
 
-    for (c <- clients) futureSet.pipeTo(c(Observer))
+    for (c <- clients) futureSet.pipeTo(c(GamePlayObserver))
   }
 }

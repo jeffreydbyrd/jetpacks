@@ -4,10 +4,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import akka.actor.{Props, PoisonPill, ActorRef, Actor}
 import doppelengine.entity.EntityConfig
-import doppelengine.core.Engine
-import doppelengine.system.System.UpdateEntities
+import doppelengine.core.{EntityOpSuccess, EntityOpFailure, CreateEntities}
 import akka.util.Timeout
-import doppelengine.core.Engine.OpFailure
 
 object Helper {
   def props(engine: ActorRef, conn: ActorRef, numConns: Int, v: Long, config: EntityConfig) =
@@ -18,17 +16,17 @@ class Helper(engine: ActorRef, conn: ActorRef, numConns: Int, var v: Long, confi
   implicit val timeout: akka.util.Timeout = Timeout(1.second)
 
   def attempt() = {
-    engine ! Engine.Add(v, Set(config))
+    engine ! CreateEntities(v, Set(config))
   }
 
   attempt()
 
   override def receive: Receive = {
-    case correction: OpFailure =>
+    case correction: EntityOpFailure =>
       v = correction.v
       attempt()
 
-    case ack: Engine.OpSuccess =>
+    case ack: EntityOpSuccess =>
       self ! PoisonPill
       val inputSel = context.actorSelection(engine.path / s"input-$numConns")
       val observerSel = context.actorSelection(engine.path / s"observer-$numConns")

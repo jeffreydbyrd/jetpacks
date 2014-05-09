@@ -10,19 +10,17 @@ import game.components.physics.DimensionComponent
 import doppelengine.entity.EntityId
 import game.components.startscreen.ReadyComponent
 
-object ObserverComponent {
-  val props = Props(classOf[ObserverComponent])
+object GamePlayObserverComponent {
+  val props = Props(classOf[GamePlayObserverComponent])
 
   // received
   case class UpdateEntities(snaps: Set[(EntityId, DimensionComponent.Snapshot)])
 
-  case class UpdateReadyMenu(snaps: Set[(EntityId, ReadyComponent.Snapshot)])
-
 }
 
-class ObserverComponent extends Component {
+class GamePlayObserverComponent extends Component {
 
-  import ObserverComponent._
+  import GamePlayObserverComponent._
 
   var connection: Option[ActorRef] = None
 
@@ -32,6 +30,7 @@ class ObserverComponent extends Component {
   override def receive = LoggingReceive {
     case UpdateEntities(snaps) if connection.isDefined =>
       val Some(conn) = connection
+
       for ((id, snap) <- snaps if !snapshots.contains(id))
         conn ! ClientCommand.CreateRect(id.toString, snap.pos, snap.shape)
 

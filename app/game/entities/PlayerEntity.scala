@@ -3,7 +3,7 @@ package game.entities
 import doppelengine.component.ComponentType
 import akka.actor.ActorRef
 import doppelengine.entity.{EntityId, Entity}
-import game.components.types.{Mobility, Dimension, Observer, Input}
+import game.components.types.{Mobility, Dimension, GamePlayObserver, Input}
 
 
 class PlayerEntity( inputComponent: ActorRef,
@@ -14,7 +14,7 @@ class PlayerEntity( inputComponent: ActorRef,
 
   override val components: Map[ ComponentType, ActorRef ] = Map(
     Input -> inputComponent,
-    Observer -> observerComponent,
+    GamePlayObserver -> observerComponent,
     Dimension -> dimensionsComponent,
     Mobility -> mobileComponent
   )

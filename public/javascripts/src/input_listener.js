@@ -4,7 +4,10 @@ function InputListener() {
 	var keybindings = COMMANDS.keyBindings;
 
 	// For some keys, we need to know when the user releases it:
-  var needsReleased = [COMMANDS.left, COMMANDS.right, COMMANDS.jump];
+  var needsReleased = [
+	  COMMANDS.left, COMMANDS.right,
+	  COMMANDS.jump, COMMANDS.activate
+  ];
 
   function keyDown(evt) {
     var type = keybindings[evt.keyCode];
