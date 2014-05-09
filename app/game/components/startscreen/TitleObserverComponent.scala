@@ -24,7 +24,7 @@ class TitleObserverComponent extends Actor {
     case UpdateEntities(snaps) if connection.isDefined =>
       val Some(conn) = connection
 
-      val tuples =
+      val tuples: Set[(String, Boolean)] =
         for ((id, Snapshot(isReady)) <- snaps) yield {
           id.name -> isReady
         }

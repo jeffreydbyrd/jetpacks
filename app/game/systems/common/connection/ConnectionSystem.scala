@@ -13,6 +13,7 @@ import game.components.types._
 import play.api.libs.json.{Json, JsValue}
 import game.MyGame
 import game.components.startscreen.{ReadyComponent, TitleObserverComponent}
+import game.entities.StartScreenEntity
 
 object ConnectionSystem {
   def props = Props(classOf[ConnectionSystem])
@@ -50,27 +51,13 @@ class ConnectionSystem extends System(0.millis) {
   def connectPlayer(username: String) = {
     val (enumerator, channel) = play.api.libs.iteratee.Concurrent.broadcast[JsValue]
 
-    val connection =
-      context.actorOf(PlayActorConnection.props(channel), s"conn-$numConnections")
-
-    val input =
-      new ComponentConfig(InputComponent.props, s"input-$numConnections")
-    val observer =
-      new ComponentConfig(TitleObserverComponent.props, s"observer-$numConnections")
-    val ready =
-      new ComponentConfig(ReadyComponent.props, s"ready-$numConnections")
-
     val id = (context.parent.path / username).toString
-
-    val config: EntityConfig = EntityConfig(
-      EntityId(id, username),
-      Map(
-        Input -> input, TitleObserver -> observer, Ready -> ready
-      )
-    )
+    val config: EntityConfig = StartScreenEntity.config(id, username)
+    val connection =
+      context.actorOf(PlayActorConnection.props(channel), s"conn-$username")
 
     context.actorOf(
-      Helper.props(context.parent, connection, numConnections, this.version, config),
+      Helper.props(context.parent, connection, username, this.version, config),
       s"helper-$numConnections")
 
     sender ! Connected(connection, enumerator)

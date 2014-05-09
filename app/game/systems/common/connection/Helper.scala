@@ -8,11 +8,11 @@ import doppelengine.core.{EntityOpSuccess, EntityOpFailure, CreateEntities}
 import akka.util.Timeout
 
 object Helper {
-  def props(engine: ActorRef, conn: ActorRef, numConns: Int, v: Long, config: EntityConfig) =
-    Props(classOf[Helper], engine, conn, numConns, v, config)
+  def props(engine: ActorRef, conn: ActorRef, username:String, v: Long, config: EntityConfig) =
+    Props(classOf[Helper], engine, conn, username, v, config)
 }
 
-class Helper(engine: ActorRef, conn: ActorRef, numConns: Int, var v: Long, config: EntityConfig) extends Actor {
+class Helper(engine: ActorRef, conn: ActorRef, username:String, var v: Long, config: EntityConfig) extends Actor {
   implicit val timeout: akka.util.Timeout = Timeout(1.second)
 
   def attempt() = {
@@ -28,8 +28,8 @@ class Helper(engine: ActorRef, conn: ActorRef, numConns: Int, var v: Long, confi
 
     case ack: EntityOpSuccess =>
       self ! PoisonPill
-      val inputSel = context.actorSelection(engine.path / s"input-$numConns")
-      val observerSel = context.actorSelection(engine.path / s"observer-$numConns")
+      val inputSel = context.actorSelection(engine.path / s"input-$username")
+      val observerSel = context.actorSelection(engine.path / s"observer-$username")
 
       for (ref <- inputSel.resolveOne) conn ! ref
       for (ref <- observerSel.resolveOne) ref ! conn
