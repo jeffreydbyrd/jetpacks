@@ -26,8 +26,7 @@ class TitleObserverComponent extends Actor {
 
       val tuples =
         for ((id, Snapshot(isReady)) <- snaps) yield {
-          val str = id.toString
-          str.substring(str.lastIndexOf('/')) -> isReady
+          id.name -> isReady
         }
 
       conn ! ClientCommand.UpdateIntro(tuples.toMap)

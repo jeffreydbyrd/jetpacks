@@ -3,11 +3,11 @@ package game.systems.common.connection
 import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.iteratee.Enumerator
-import game.components.gameplay.io.{GamePlayObserverComponent, InputComponent}
+import game.components.gameplay.io.InputComponent
 import doppelengine.component.ComponentConfig
 import doppelengine.system.System
 import akka.actor.Terminated
-import doppelengine.entity.{Entity, EntityConfig}
+import doppelengine.entity.{EntityId, Entity, EntityConfig}
 import game.components.gameplay.io.connection.PlayActorConnection
 import game.components.types._
 import play.api.libs.json.{Json, JsValue}
@@ -60,8 +60,13 @@ class ConnectionSystem extends System(0.millis) {
     val ready =
       new ComponentConfig(ReadyComponent.props, s"ready-$numConnections")
 
-    val config: EntityConfig = Map(
-      Input -> input, TitleObserver -> observer, Ready -> ready
+    val id = (context.parent.path / username).toString
+
+    val config: EntityConfig = EntityConfig(
+      EntityId(id, username),
+      Map(
+        Input -> input, TitleObserver -> observer, Ready -> ready
+      )
     )
 
     context.actorOf(

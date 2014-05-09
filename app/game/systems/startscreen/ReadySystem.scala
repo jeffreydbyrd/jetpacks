@@ -22,7 +22,7 @@ object ReadySystem {
   def props = Props[ReadySystem]
 }
 
-class ReadySystem extends System(100.millis) {
+class ReadySystem extends System(80.millis) {
 
   import ReadySystem._
 
@@ -43,7 +43,7 @@ class ReadySystem extends System(100.millis) {
       e(Ready) ! true
     }
 
-    // For all those that are ready
+    // Forward status of each entity to every other entity
     val setOfFutures: Set[Future[(EntityId, Snapshot)]] =
       for (e <- entities) yield
         (e(Ready) ? RequestSnapshot) map {
