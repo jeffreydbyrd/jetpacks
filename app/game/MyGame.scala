@@ -3,12 +3,13 @@ package game
 import akka.actor.{ActorRef, ActorSystem}
 
 import doppelengine.core.Engine
-import game.systems.{ReadySystem, VisualSystem, QuitSystem}
-import game.systems.physics.PhysicsSystem
+import game.systems.gameplay.physics.PhysicsSystem
 import scala.concurrent.duration._
-import game.systems.connection.ConnectionSystem
+import game.systems.common.connection.ConnectionSystem
 import scala.concurrent.{Await, Future}
 import doppelengine.system.SystemConfig
+import game.systems.common.QuitSystem
+import game.systems.startscreen.ReadySystem
 
 object MyGame {
 

@@ -1,4 +1,4 @@
-package game.systems
+package game.systems.gameplay
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -6,8 +6,8 @@ import scala.concurrent.duration._
 import akka.pattern.{ask,pipe}
 import doppelengine.component.Component
 import doppelengine.system.System
-import game.components.io.GamePlayObserverComponent
-import game.components.physics.DimensionComponent.Snapshot
+import game.components.gameplay.io.GamePlayObserverComponent
+import game.components.gameplay.physics.DimensionComponent.Snapshot
 import doppelengine.core.Engine.timeout
 import doppelengine.entity.Entity
 import doppelengine.entity.EntityId

@@ -1,4 +1,4 @@
-package game.systems.connection
+package game.systems.common.connection
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

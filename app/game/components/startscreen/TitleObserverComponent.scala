@@ -3,7 +3,7 @@ package game.components.startscreen
 import akka.actor.{PoisonPill, Props, ActorRef, Actor}
 import doppelengine.entity.EntityId
 import game.components.startscreen.ReadyComponent.Snapshot
-import game.components.io.ClientCommand
+import game.components.gameplay.io.ClientCommand
 
 object TitleObserverComponent {
   def props = Props[TitleObserverComponent]

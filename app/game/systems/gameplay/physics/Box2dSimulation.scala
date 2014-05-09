@@ -1,4 +1,4 @@
-package game.systems.physics
+package game.systems.gameplay.physics
 
 import org.jbox2d.dynamics.FixtureDef
 import org.jbox2d.collision.shapes.PolygonShape
@@ -7,11 +7,11 @@ import org.jbox2d.dynamics.Body
 import org.jbox2d.dynamics.World
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.BodyType
-import game.systems.physics.PhysicsSystem.MobileData
-import game.systems.physics.PhysicsSystem.StructData
-import game.components.physics.Rect
+import game.systems.gameplay.physics.PhysicsSystem.MobileData
+import game.systems.gameplay.physics.PhysicsSystem.StructData
+import game.components.gameplay.physics.Rect
 import doppelengine.entity.Entity
-import game.components.io.InputComponent
+import game.components.gameplay.io.InputComponent
 
 class Box2dSimulation( gx: Int, gy: Int ) {
 

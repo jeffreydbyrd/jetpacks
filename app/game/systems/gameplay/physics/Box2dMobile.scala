@@ -1,4 +1,4 @@
-package game.systems.physics
+package game.systems.gameplay.physics
 
 import org.jbox2d.dynamics.Body
 import scala.math.abs

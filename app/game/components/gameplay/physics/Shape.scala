@@ -1,4 +1,4 @@
-package game.components.physics
+package game.components.gameplay.physics
 
 trait Shape
 

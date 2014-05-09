@@ -1,4 +1,4 @@
-package game.systems.physics
+package game.systems.gameplay.physics
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -7,13 +7,13 @@ import scala.concurrent.duration.DurationInt
 import akka.actor.{Props, actorRef2Scala}
 import akka.pattern.ask
 import doppelengine.component.Component.RequestSnapshot
-import game.components.physics.DimensionComponent
-import game.components.physics.MobileComponent
+import game.components.gameplay.physics.DimensionComponent
+import game.components.gameplay.physics.MobileComponent
 import doppelengine.entity.Entity
 import doppelengine.system.System
-import game.components.io.InputComponent
-import game.components.physics.Shape
-import game.components.physics.Position
+import game.components.gameplay.io.InputComponent
+import game.components.gameplay.physics.Shape
+import game.components.gameplay.physics.Position
 import game.components.types._
 import akka.util.Timeout
 

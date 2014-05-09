@@ -1,4 +1,4 @@
-package game.components.io
+package game.components.gameplay.io
 
 import akka.actor.ActorRef
 import akka.actor.PoisonPill
@@ -6,7 +6,7 @@ import akka.actor.Props
 import akka.actor.actorRef2Scala
 import akka.event.LoggingReceive
 import doppelengine.component.Component
-import game.components.physics.DimensionComponent
+import game.components.gameplay.physics.DimensionComponent
 import doppelengine.entity.EntityId
 import game.components.startscreen.ReadyComponent
 

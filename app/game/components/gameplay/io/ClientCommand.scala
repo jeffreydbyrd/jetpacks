@@ -1,7 +1,7 @@
-package game.components.io
+package game.components.gameplay.io
 
-import game.components.physics.Rect
-import game.components.physics.Position
+import game.components.gameplay.physics.Rect
+import game.components.gameplay.physics.Position
 import play.api.libs.json.{JsArray, JsNull, JsValue, Json}
 
 /**

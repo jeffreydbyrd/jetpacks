@@ -1,6 +1,6 @@
-package game.components.io.connection
+package game.components.gameplay.io.connection
 
-import game.components.io.ClientCommand
+import game.components.gameplay.io.ClientCommand
 import play.api.libs.json.{Json, JsValue}
 
 case object TestCommand extends ClientCommand {

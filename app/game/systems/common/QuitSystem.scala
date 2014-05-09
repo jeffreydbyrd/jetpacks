@@ -1,4 +1,4 @@
-package game.systems
+package game.systems.common
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -6,7 +6,7 @@ import scala.concurrent.duration._
 import akka.actor.{Props, actorRef2Scala}
 import akka.pattern.ask
 import doppelengine.component.Component
-import game.components.io.InputComponent.Snapshot
+import game.components.gameplay.io.InputComponent.Snapshot
 import doppelengine.core.RemoveEntities
 import doppelengine.entity.Entity
 import doppelengine.system.System

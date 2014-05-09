@@ -1,4 +1,4 @@
-package game.components.io
+package game.components.gameplay.io
 
 import akka.actor.Props
 import akka.actor.actorRef2Scala

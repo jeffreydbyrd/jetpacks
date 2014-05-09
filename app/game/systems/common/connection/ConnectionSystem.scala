@@ -1,14 +1,14 @@
-package game.systems.connection
+package game.systems.common.connection
 
 import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.iteratee.Enumerator
-import game.components.io.{GamePlayObserverComponent, InputComponent}
+import game.components.gameplay.io.{GamePlayObserverComponent, InputComponent}
 import doppelengine.component.ComponentConfig
 import doppelengine.system.System
 import akka.actor.Terminated
 import doppelengine.entity.{Entity, EntityConfig}
-import game.components.io.connection.PlayActorConnection
+import game.components.gameplay.io.connection.PlayActorConnection
 import game.components.types._
 import play.api.libs.json.{Json, JsValue}
 import game.MyGame

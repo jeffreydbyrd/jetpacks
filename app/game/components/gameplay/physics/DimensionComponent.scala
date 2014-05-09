@@ -1,4 +1,4 @@
-package game.components.physics
+package game.components.gameplay.physics
 
 import akka.actor.Actor
 import akka.actor.Props

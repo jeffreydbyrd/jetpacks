@@ -3,8 +3,8 @@ package controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import akka.pattern.ask
-import game.systems.connection.ConnectionSystem
-import game.systems.connection.ConnectionSystem.AddPlayer
+import game.systems.common.connection.ConnectionSystem
+import game.systems.common.connection.ConnectionSystem.AddPlayer
 import play.api.mvc._
 import akka.util.Timeout
 import play.api.libs.iteratee.{Enumerator, Input, Done, Iteratee}

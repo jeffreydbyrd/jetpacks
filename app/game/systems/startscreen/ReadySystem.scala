@@ -1,4 +1,4 @@
-package game.systems
+package game.systems.startscreen
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -11,7 +11,7 @@ import akka.actor.Props
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import scala.concurrent.Future
-import game.components.io.InputComponent
+import game.components.gameplay.io.InputComponent
 import game.components.startscreen.ReadyComponent
 import game.components.startscreen.ReadyComponent.Snapshot
 import game.components.startscreen.TitleObserverComponent.UpdateEntities
