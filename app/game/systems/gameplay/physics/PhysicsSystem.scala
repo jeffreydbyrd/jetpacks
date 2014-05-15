@@ -11,7 +11,7 @@ import game.components.gameplay.physics.DimensionComponent
 import game.components.gameplay.physics.MobileComponent
 import doppelengine.entity.Entity
 import doppelengine.system.System
-import game.components.gameplay.io.InputComponent
+import game.components.common.io.InputComponent
 import game.components.gameplay.physics.Shape
 import game.components.gameplay.physics.Position
 import game.components.types._

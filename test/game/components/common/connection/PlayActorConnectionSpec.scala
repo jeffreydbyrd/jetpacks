@@ -1,4 +1,4 @@
-package game.components.gameplay.io.connection
+package game.components.common.connection
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import org.scalatest.{MustMatchers, FunSuiteLike, BeforeAndAfterAll}
 import play.api.libs.json.{JsString, JsObject, Json, JsValue}
 import play.api.libs.iteratee.Iteratee
-import game.components.gameplay.io.ClientCommand.ServerQuit
+import game.components.common.io.ClientCommand.ServerQuit
 
 class PlayActorConnectionSpec
   extends TestKit(ActorSystem("EngineSpec"))

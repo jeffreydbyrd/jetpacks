@@ -1,13 +1,13 @@
-package game.entities
+package game.entities.startscreen
 
-import doppelengine.entity.{EntityId, EntityConfig, Entity}
+import doppelengine.entity.{EntityId, EntityConfig}
 import doppelengine.component.ComponentConfig
-import game.components.gameplay.io.InputComponent
+import game.components.common.io.InputComponent
 import game.components.startscreen.{ReadyComponent, TitleObserverComponent}
 import game.components.types.{Ready, TitleObserver, Input}
 
 object StartScreenEntity {
-  def config(id: String, name: String): EntityConfig = {
+  def config(name: String): EntityConfig = {
     val input =
       new ComponentConfig(InputComponent.props, s"input-$name")
     val observer =
@@ -16,7 +16,7 @@ object StartScreenEntity {
       new ComponentConfig(ReadyComponent.props, s"ready-$name")
 
     EntityConfig(
-      EntityId(id, name),
+      EntityId(s"startscreen-$name", name),
       Map(
         Input -> input, TitleObserver -> observer, Ready -> ready
       )

@@ -3,7 +3,7 @@ package game.components.startscreen
 import akka.actor.{PoisonPill, Props, ActorRef, Actor}
 import doppelengine.entity.EntityId
 import game.components.startscreen.ReadyComponent.Snapshot
-import game.components.gameplay.io.ClientCommand
+import game.components.common.io.ClientCommand
 
 object TitleObserverComponent {
   def props = Props[TitleObserverComponent]
@@ -30,9 +30,5 @@ class TitleObserverComponent extends Actor {
         }
 
       conn ! ClientCommand.UpdateIntro(tuples.toMap)
-  }
-
-  override def postStop() = {
-    for (c <- connection) c ! PoisonPill
   }
 }

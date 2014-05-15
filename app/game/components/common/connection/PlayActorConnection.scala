@@ -1,4 +1,4 @@
-package game.components.gameplay.io.connection
+package game.components.common.connection
 
 import akka.actor.Actor
 import akka.actor.ActorRef
@@ -9,7 +9,7 @@ import akka.event.LoggingReceive
 
 import play.api.libs.iteratee.Concurrent.Channel
 import play.api.libs.iteratee.Enumerator
-import game.components.gameplay.io.{ClientCommand, ServerCommand}
+import game.components.common.io.{ClientCommand, ServerCommand}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import ClientCommand.ServerQuit
 

@@ -3,14 +3,15 @@ package controllers
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import akka.pattern.ask
-import game.systems.common.connection.ConnectionSystem
-import game.systems.common.connection.ConnectionSystem.AddPlayer
+import game.systems.common.ConnectionSystem
+import ConnectionSystem.AddPlayer
 import play.api.mvc._
 import akka.util.Timeout
 import play.api.libs.iteratee.{Enumerator, Input, Done, Iteratee}
 import game.MyGame
 import play.api.libs.json.JsValue
 import scala.concurrent.Future
+import game.systems.common.ConnectionSystem
 
 object PlayController extends Controller {
 

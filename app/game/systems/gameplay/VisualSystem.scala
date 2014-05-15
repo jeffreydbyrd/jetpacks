@@ -6,13 +6,13 @@ import scala.concurrent.duration._
 import akka.pattern.{ask,pipe}
 import doppelengine.component.Component
 import doppelengine.system.System
-import game.components.gameplay.io.GamePlayObserverComponent
 import game.components.gameplay.physics.DimensionComponent.Snapshot
 import doppelengine.core.Engine.timeout
 import doppelengine.entity.Entity
 import doppelengine.entity.EntityId
 import game.components.types.{GamePlayObserver, Dimension}
 import akka.actor.Props
+import game.components.gameplay.GamePlayObserverComponent
 
 object VisualSystem {
   def props = Props[VisualSystem]

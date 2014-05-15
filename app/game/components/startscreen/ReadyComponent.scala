@@ -9,7 +9,7 @@ object ReadyComponent {
   val props = Props[ReadyComponent]
 
   // Sent
-  case class Snapshot(isRead: Boolean)
+  case class Snapshot(isReady: Boolean)
 
 }
 

@@ -11,7 +11,7 @@ import game.systems.gameplay.physics.PhysicsSystem.MobileData
 import game.systems.gameplay.physics.PhysicsSystem.StructData
 import game.components.gameplay.physics.Rect
 import doppelengine.entity.Entity
-import game.components.gameplay.io.InputComponent
+import game.components.common.io.InputComponent
 
 class Box2dSimulation( gx: Int, gy: Int ) {
 

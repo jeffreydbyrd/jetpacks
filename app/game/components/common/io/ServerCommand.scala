@@ -1,4 +1,4 @@
-package game.components.gameplay.io
+package game.components.common.io
 
 import play.api.libs.json.{Json, JsValue}
 

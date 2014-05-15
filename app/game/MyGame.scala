@@ -5,10 +5,9 @@ import akka.actor.{ActorRef, ActorSystem}
 import doppelengine.core.Engine
 import game.systems.gameplay.physics.PhysicsSystem
 import scala.concurrent.duration._
-import game.systems.common.connection.ConnectionSystem
 import scala.concurrent.{Await, Future}
 import doppelengine.system.SystemConfig
-import game.systems.common.QuitSystem
+import game.systems.common.{ConnectionSystem, QuitSystem}
 import game.systems.startscreen.ReadySystem
 
 object MyGame {
@@ -25,7 +24,7 @@ object MyGame {
 
   private val actorSystem: ActorSystem = akka.actor.ActorSystem("Doppelsystem")
 
-  private val doppelengine: ActorRef =
+  val doppelengine: ActorRef =
     actorSystem.actorOf(Engine.props(sysConfigs, Set()), name = "engine")
 
   val connectionSystem = {

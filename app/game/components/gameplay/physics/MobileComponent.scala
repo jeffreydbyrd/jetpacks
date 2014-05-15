@@ -15,10 +15,6 @@ object MobileComponent {
   case class Snapshot( speed: Float, hops: Float )
 }
 
-/**
- * speed: think "meters / sec"
- * hops: a number between 0.0 and 1.0 (percent gravity)
- */
 class MobileComponent( var speed: Float, var hops: Float ) extends Actor {
   import MobileComponent._
 

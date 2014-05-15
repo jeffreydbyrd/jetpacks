@@ -1,4 +1,4 @@
-package game.components.gameplay.io
+package game.components.common.io
 
 import game.components.gameplay.physics.Rect
 import game.components.gameplay.physics.Position

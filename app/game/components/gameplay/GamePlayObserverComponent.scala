@@ -1,14 +1,13 @@
-package game.components.gameplay.io
+package game.components.gameplay
 
 import akka.actor.ActorRef
-import akka.actor.PoisonPill
 import akka.actor.Props
 import akka.actor.actorRef2Scala
 import akka.event.LoggingReceive
 import doppelengine.component.Component
 import game.components.gameplay.physics.DimensionComponent
 import doppelengine.entity.EntityId
-import game.components.startscreen.ReadyComponent
+import game.components.common.io.ClientCommand
 
 object GamePlayObserverComponent {
   val props = Props(classOf[GamePlayObserverComponent])
@@ -46,9 +45,5 @@ class GamePlayObserverComponent extends Component {
       snapshots = snaps.toMap
 
     case conn: ActorRef => connection = Some(conn)
-  }
-
-  override def postStop() = {
-    for (c <- connection) c ! PoisonPill
   }
 }

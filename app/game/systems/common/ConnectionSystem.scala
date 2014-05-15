@@ -1,19 +1,17 @@
-package game.systems.common.connection
+package game.systems.common
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.iteratee.Enumerator
-import game.components.gameplay.io.InputComponent
-import doppelengine.component.ComponentConfig
 import doppelengine.system.System
 import akka.actor.Terminated
-import doppelengine.entity.{EntityId, Entity, EntityConfig}
-import game.components.gameplay.io.connection.PlayActorConnection
-import game.components.types._
+import doppelengine.entity.{Entity, EntityConfig}
+import game.components.common.connection.PlayActorConnection
 import play.api.libs.json.{Json, JsValue}
 import game.MyGame
-import game.components.startscreen.{ReadyComponent, TitleObserverComponent}
-import game.entities.StartScreenEntity
+import game.entities.startscreen.StartScreenEntity
+import akka.util.Timeout
 
 object ConnectionSystem {
   def props = Props(classOf[ConnectionSystem])
@@ -45,20 +43,25 @@ class ConnectionSystem extends System(0.millis) {
 
   import ConnectionSystem._
 
+  implicit val timeout: Timeout = 1.second
+
   var connections: Map[String, ActorRef] = Map()
   var numConnections: Int = 0
 
   def connectPlayer(username: String) = {
     val (enumerator, channel) = play.api.libs.iteratee.Concurrent.broadcast[JsValue]
 
-    val id = (context.parent.path / username).toString
-    val config: EntityConfig = StartScreenEntity.config(id, username)
+    val config: EntityConfig = StartScreenEntity.config(username)
     val connection =
       context.actorOf(PlayActorConnection.props(channel), s"conn-$username")
 
-    context.actorOf(
-      Helper.props(context.parent, connection, username, this.version, config),
-      s"helper-$numConnections")
+    createEntities(context.parent, Set(config)).foreach(_ => {
+      val inputSel = context.actorSelection(s"../input-$username")
+      val observerSel = context.actorSelection(s"../observer-$username")
+
+      for (ref <- inputSel.resolveOne) connection ! ref
+      for (ref <- observerSel.resolveOne) ref ! connection
+    })
 
     sender ! Connected(connection, enumerator)
     numConnections += 1
