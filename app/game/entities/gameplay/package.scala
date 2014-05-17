@@ -1,4 +1,4 @@
-package game.entities.gameplay
+package game.entities
 
 import doppelengine.entity.{EntityId, EntityConfig}
 import doppelengine.component.ComponentConfig
@@ -7,8 +7,9 @@ import game.components.gameplay.GamePlayObserverComponent
 import game.components.gameplay.physics.{MobileComponent, DimensionComponent}
 import game.components.types.{Mobility, Dimension, GamePlayObserver, Input}
 
-object Player {
-  def create(id: String, username: String): EntityConfig = {
+package object gameplay {
+  def player(id: EntityId): EntityConfig = {
+    val username = id.name
     val input =
       new ComponentConfig(InputComponent.props, s"gameplay-input-$username")
     val observer =
@@ -19,7 +20,7 @@ object Player {
       new ComponentConfig(MobileComponent.props(20, 20), s"gameplay-mobile-$username")
 
     EntityConfig(
-      EntityId(id, username),
+      EntityId(s"gameplay-$username", username),
       Map(
         Input -> input, GamePlayObserver -> observer,
         Dimension -> dimensinos, Mobility -> mobility

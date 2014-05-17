@@ -8,16 +8,17 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import doppelengine.system.SystemConfig
 import game.systems.common.{ConnectionSystem, QuitSystem}
-import game.systems.startscreen.ReadySystem
+import game.systems.startscreen.{StartSystem, ReadySystem}
 
 object MyGame {
 
-  val numPlayers = 2
+  val numPlayers = 1
 
   private val sysConfigs: Set[SystemConfig] = Set(
     SystemConfig(ConnectionSystem.props, "connection-system"),
     SystemConfig(QuitSystem.props, "quit-system"),
-    SystemConfig(ReadySystem.props, "ready-system")
+    SystemConfig(ReadySystem.props, "ready-system"),
+    SystemConfig(StartSystem.props, "start-system")
   )
 
   implicit val timeout: akka.util.Timeout = 1.second
