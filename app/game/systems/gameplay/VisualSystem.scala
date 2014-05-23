@@ -26,7 +26,6 @@ class VisualSystem
   var visuals: Set[Entity] = Set()
 
   override def updateEntities(entities: Set[Entity]): Unit = {
-    log.info("visual-system received update: " + entities)
     var newClients: Set[Entity] = Set()
     var newVisuals: Set[Entity] = Set()
     for (e <- entities) {
@@ -51,13 +50,4 @@ class VisualSystem
     for (c <- clients) futureSet.pipeTo(c(GamePlayObserver))
   }
 
-  override def preStart() = {
-    super.preStart()
-    log.info("visual-system started")
-  }
-
-  override def postStop() = {
-    super.postStop()
-    log.info("visual-system stopped")
-  }
 }

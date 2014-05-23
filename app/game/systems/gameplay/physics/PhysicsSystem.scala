@@ -105,12 +105,4 @@ class PhysicsSystem(gx: Int, gy: Int)
       e(Dimension) ! DimensionComponent.UpdatePosition(x, y)
     }
   }
-
-  override def preStart() = {
-    log.info("physics-system started")
-  }
-
-  override def postStop() = {
-    log.info("physics-system stopped")
-  }
 }

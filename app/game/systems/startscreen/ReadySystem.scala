@@ -58,13 +58,4 @@ class ReadySystem
       futureUpdate.pipeTo(e(TitleObserver))
   }
 
-  override def preStart() = {
-    super.preStart()
-    log.info("ready-system started")
-  }
-
-  override def postStop() = {
-    super.postStop()
-    log.info("ready-system stopped")
-  }
 }

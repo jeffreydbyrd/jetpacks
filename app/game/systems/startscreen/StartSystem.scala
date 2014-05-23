@@ -15,13 +15,14 @@ import game.MyGame
 import game.systems.gameplay.VisualSystem
 import akka.actor.{ActorLogging, PoisonPill, Props}
 import game.entities.gameplay.GamePlay
+import game.systems.gameplay.physics.PhysicsSystem
 
 object StartSystem {
   val props = Props[StartSystem]
 }
 
 class StartSystem
-  extends System(500.millis)
+  extends System(1.second)
   with ActorLogging {
 
   implicit val timeout: Timeout = 1.second
@@ -32,16 +33,20 @@ class StartSystem
   val fReadySystem = context.actorSelection("../ready-system").resolveOne()
 
   def startGame(): Unit = {
+
+    // Hold on to this snapshot of `entities`
+    val titleEntities = entities
+
     val sysConfigs = Set(
-      SystemConfig(VisualSystem.props, "visual-system")
-      //SystemConfig(PhysicsSystem.props(0, -35), "physics-system")
+      SystemConfig(VisualSystem.props, "visual-system"),
+      SystemConfig(PhysicsSystem.props(0, -35), "physics-system")
     )
 
     addSystems(sysConfigs) // add gameplay systems
 
     for {
-      _ <- removeEntities(entities) // remove title-screen entities
-      e <- entities
+      _ <- removeEntities(titleEntities) // remove title-screen entities
+      e <- titleEntities
       (_, comp) <- e.components
     } comp ! PoisonPill
 
@@ -50,13 +55,14 @@ class StartSystem
       ref ! PoisonPill
     })
 
-    // add player entities
+    // player configs
     val playerConfigs: Set[EntityConfig] =
       for {
-        e <- entities
+        e <- titleEntities
         username = e.id.name
       } yield GamePlay.player(username)
 
+    // wall configs
     val wallConfigs = Set(
       GamePlay.wall("floor", 25, 0, 50, 1),
       GamePlay.wall("ceiling", 25, 50, 50, 1),
@@ -64,19 +70,17 @@ class StartSystem
       GamePlay.wall("right_wall", 50, 25, 1, 50)
     )
 
+    // create gameplay entities
     val f: Future[Unit] = createEntities(playerConfigs ++ wallConfigs)
-    Await.result(f, 1.second)
-
-    for (e <- entities) {
-      log.info("created entities")
+    for (_ <- f; e <- titleEntities) {
       val username = e.id.name
       val fConn = context.actorSelection(s"../connection-system/conn-$username").resolveOne()
+      val fInput = context.actorSelection(s"../gameplay-input-$username").resolveOne()
+      val fObserver = context.actorSelection(s"../gameplay-observer-$username").resolveOne()
+
       for (conn <- fConn) {
-        val fInput = context.actorSelection(s"../gameplay-input-$username").resolveOne()
-        val fObserver = context.actorSelection(s"../gameplay-observer-$username").resolveOne()
-        for (ref <- fInput) conn ! ref
-        for (ref <- fObserver) ref ! conn
-        log.info("sending connection...")
+        for (input <- fInput) conn ! input
+        for (observer <- fObserver) observer ! conn
       }
     }
   }
@@ -86,15 +90,15 @@ class StartSystem
   }
 
   override def onTick(): Unit = if (!starting) {
-    val setOfFutures: Set[Future[Snapshot]] =
+    val setOfFutures: List[Future[Snapshot]] =
       entities.map {
         e => (e(Ready) ? RequestSnapshot).mapTo[ReadyComponent.Snapshot]
-      }
+      }.toList
 
-    val futureSet: Future[Set[Snapshot]] = Future.sequence(setOfFutures)
+    val futureSet: Future[List[Snapshot]] = Future.sequence(setOfFutures)
 
     // we should await the value so that we don't clash with future ticks
-    val snaps: Set[Snapshot] = Await.result(futureSet, 1.second)
+    val snaps: List[Snapshot] = Await.result(futureSet, 1.second)
 
     if (snaps.forall(_.isReady) && snaps.size == MyGame.numPlayers) {
       starting = true
@@ -102,13 +106,4 @@ class StartSystem
     }
   }
 
-  override def preStart() = {
-    super.preStart()
-    log.info("start-system started")
-  }
-
-  override def postStop() = {
-    super.postStop()
-    log.info("start-system stopped")
-  }
 }

@@ -12,7 +12,7 @@ import game.systems.startscreen.{StartSystem, ReadySystem}
 
 object MyGame {
 
-  val numPlayers = 1
+  val numPlayers = 2
 
   private val sysConfigs: Set[SystemConfig] = Set(
     SystemConfig(ConnectionSystem.props, "connection-system"),
