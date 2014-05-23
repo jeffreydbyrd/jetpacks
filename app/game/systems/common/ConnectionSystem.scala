@@ -55,7 +55,7 @@ class ConnectionSystem extends System(0.millis) {
     val connection =
       context.actorOf(PlayActorConnection.props(channel), s"conn-$username")
 
-    createEntities(context.parent, Set(config)).foreach(_ => {
+    createEntities(Set(config)).foreach(_ => {
       val inputSel = context.actorSelection(s"../input-$username")
       val observerSel = context.actorSelection(s"../observer-$username")
 

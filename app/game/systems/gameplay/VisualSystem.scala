@@ -3,7 +3,7 @@ package game.systems.gameplay
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import akka.pattern.{ask,pipe}
+import akka.pattern.{ask, pipe}
 import doppelengine.component.Component
 import doppelengine.system.System
 import game.components.gameplay.physics.DimensionComponent.Snapshot
@@ -11,19 +11,22 @@ import doppelengine.core.Engine.timeout
 import doppelengine.entity.Entity
 import doppelengine.entity.EntityId
 import game.components.types.{GamePlayObserver, Dimension}
-import akka.actor.Props
+import akka.actor.{ActorLogging, Props}
 import game.components.gameplay.GamePlayObserverComponent
 
 object VisualSystem {
   def props = Props[VisualSystem]
 }
 
-class VisualSystem extends System(16.millis) {
+class VisualSystem
+  extends System(16.millis)
+  with ActorLogging {
 
   var clients: Set[Entity] = Set()
   var visuals: Set[Entity] = Set()
 
   override def updateEntities(entities: Set[Entity]): Unit = {
+    log.info("visual-system received update: " + entities)
     var newClients: Set[Entity] = Set()
     var newVisuals: Set[Entity] = Set()
     for (e <- entities) {
@@ -46,5 +49,15 @@ class VisualSystem extends System(16.millis) {
       }
 
     for (c <- clients) futureSet.pipeTo(c(GamePlayObserver))
+  }
+
+  override def preStart() = {
+    super.preStart()
+    log.info("visual-system started")
+  }
+
+  override def postStop() = {
+    super.postStop()
+    log.info("visual-system stopped")
   }
 }

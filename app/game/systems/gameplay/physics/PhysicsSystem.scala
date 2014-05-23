@@ -4,7 +4,7 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-import akka.actor.{Props, actorRef2Scala}
+import akka.actor.{ActorLogging, Props, actorRef2Scala}
 import akka.pattern.ask
 import doppelengine.component.Component.RequestSnapshot
 import game.components.gameplay.physics.DimensionComponent
@@ -45,7 +45,9 @@ object PhysicsSystem {
     })
 }
 
-class PhysicsSystem(gx: Int, gy: Int) extends System(20.millis) {
+class PhysicsSystem(gx: Int, gy: Int)
+  extends System(20.millis)
+  with ActorLogging {
 
   import PhysicsSystem._
 
@@ -102,5 +104,13 @@ class PhysicsSystem(gx: Int, gy: Int) extends System(20.millis) {
       val y = b2Mob.body.getPosition.y
       e(Dimension) ! DimensionComponent.UpdatePosition(x, y)
     }
+  }
+
+  override def preStart() = {
+    log.info("physics-system started")
+  }
+
+  override def postStop() = {
+    log.info("physics-system stopped")
   }
 }

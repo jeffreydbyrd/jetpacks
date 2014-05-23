@@ -7,7 +7,7 @@ import doppelengine.entity.{EntityId, Entity}
 import doppelengine.component.ComponentType
 import doppelengine.component.Component.RequestSnapshot
 import game.components.types._
-import akka.actor.Props
+import akka.actor.{ActorLogging, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import scala.concurrent.Future
@@ -22,7 +22,9 @@ object ReadySystem {
   def props = Props[ReadySystem]
 }
 
-class ReadySystem extends System(80.millis) {
+class ReadySystem
+  extends System(100.millis)
+  with ActorLogging {
 
   import ReadySystem._
 
@@ -34,7 +36,6 @@ class ReadySystem extends System(80.millis) {
   }
 
   override def onTick(): Unit = {
-
     // Update the ReadyComponents
     for {
       e <- entities
@@ -55,5 +56,15 @@ class ReadySystem extends System(80.millis) {
 
     for (e <- entities)
       futureUpdate.pipeTo(e(TitleObserver))
+  }
+
+  override def preStart() = {
+    super.preStart()
+    log.info("ready-system started")
+  }
+
+  override def postStop() = {
+    super.postStop()
+    log.info("ready-system stopped")
   }
 }

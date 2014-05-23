@@ -36,6 +36,7 @@ function Connection(url) {
   var expectedSeq = 0;
 
   function receive(data) {
+    //console.log(data);
     var params = data.message;
 
     if (data.seq <= expectedSeq) {

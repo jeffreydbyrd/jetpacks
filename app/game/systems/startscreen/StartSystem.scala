@@ -3,7 +3,7 @@ package game.systems.startscreen
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import doppelengine.system.{SystemConfig, System}
-import doppelengine.entity.{EntityConfig, Entity}
+import doppelengine.entity.{EntityConfig, EntityId, Entity}
 import game.components.types.Ready
 import akka.pattern.ask
 import doppelengine.component.Component.RequestSnapshot
@@ -13,15 +13,17 @@ import scala.concurrent.{Await, Future}
 import game.components.startscreen.ReadyComponent.Snapshot
 import game.MyGame
 import game.systems.gameplay.VisualSystem
-import game.systems.gameplay.physics.PhysicsSystem
-import akka.actor.{Props, ActorRef}
-import game.entities.gameplay
+import akka.actor.{ActorLogging, PoisonPill, Props}
+import game.entities.gameplay.GamePlay
 
 object StartSystem {
   val props = Props[StartSystem]
 }
 
-class StartSystem extends System(500.millis) {
+class StartSystem
+  extends System(500.millis)
+  with ActorLogging {
+
   implicit val timeout: Timeout = 1.second
 
   var starting = false
@@ -31,35 +33,51 @@ class StartSystem extends System(500.millis) {
 
   def startGame(): Unit = {
     val sysConfigs = Set(
-      SystemConfig(VisualSystem.props, "visual-system"),
-      SystemConfig(PhysicsSystem.props(0, -35), "physics-system")
+      SystemConfig(VisualSystem.props, "visual-system")
+      //SystemConfig(PhysicsSystem.props(0, -35), "physics-system")
     )
 
-    addSystems(context.parent, sysConfigs) // add gameplay systems
+    addSystems(sysConfigs) // add gameplay systems
 
-    removeEntities(context.parent, entities) // remove title-screen entities
+    for {
+      _ <- removeEntities(entities) // remove title-screen entities
+      e <- entities
+      (_, comp) <- e.components
+    } comp ! PoisonPill
 
     fReadySystem.foreach(ref => {
-      remSystems(context.parent, Set(self, ref)) // remove title-screen systems
+      remSystems(Set(self, ref)) // remove title-screen systems
+      ref ! PoisonPill
     })
 
     // add player entities
-    val fConnections: Set[(Entity, Future[ActorRef])] =
-      for (e <- entities) yield
-        (e, context.actorSelection(s"../connection-system/conn-${e.id.name}").resolveOne())
+    val playerConfigs: Set[EntityConfig] =
+      for {
+        e <- entities
+        username = e.id.name
+      } yield GamePlay.player(username)
 
-    for {
-      (e, fConn) <- fConnections
-      username = e.id.name
-      config = gameplay.player(e.id)
-      _ <- createEntities(context.parent, Set(config))
-      conn <- fConn
-    } {
-      val inputSel = context.actorSelection(s"../input-$username")
-      val observerSel = context.actorSelection(s"../observer-$username")
+    val wallConfigs = Set(
+      GamePlay.wall("floor", 25, 0, 50, 1),
+      GamePlay.wall("ceiling", 25, 50, 50, 1),
+      GamePlay.wall("left_wall", 0, 25, 1, 50),
+      GamePlay.wall("right_wall", 50, 25, 1, 50)
+    )
 
-      for (ref <- inputSel.resolveOne) conn ! ref
-      for (ref <- observerSel.resolveOne) ref ! conn
+    val f: Future[Unit] = createEntities(playerConfigs ++ wallConfigs)
+    Await.result(f, 1.second)
+
+    for (e <- entities) {
+      log.info("created entities")
+      val username = e.id.name
+      val fConn = context.actorSelection(s"../connection-system/conn-$username").resolveOne()
+      for (conn <- fConn) {
+        val fInput = context.actorSelection(s"../gameplay-input-$username").resolveOne()
+        val fObserver = context.actorSelection(s"../gameplay-observer-$username").resolveOne()
+        for (ref <- fInput) conn ! ref
+        for (ref <- fObserver) ref ! conn
+        log.info("sending connection...")
+      }
     }
   }
 
@@ -82,5 +100,15 @@ class StartSystem extends System(500.millis) {
       starting = true
       startGame()
     }
+  }
+
+  override def preStart() = {
+    super.preStart()
+    log.info("start-system started")
+  }
+
+  override def postStop() = {
+    super.postStop()
+    log.info("start-system stopped")
   }
 }
