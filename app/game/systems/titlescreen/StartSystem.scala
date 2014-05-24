@@ -1,4 +1,4 @@
-package game.systems.startscreen
+package game.systems.titlescreen
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -8,9 +8,9 @@ import game.components.types.Ready
 import akka.pattern.ask
 import doppelengine.component.Component.RequestSnapshot
 import akka.util.Timeout
-import game.components.startscreen.ReadyComponent
+import game.components.titlescreen.ReadyComponent
 import scala.concurrent.{Await, Future}
-import game.components.startscreen.ReadyComponent.Snapshot
+import game.components.titlescreen.ReadyComponent.Snapshot
 import game.MyGame
 import game.systems.gameplay.VisualSystem
 import akka.actor.{ActorLogging, PoisonPill, Props}
@@ -44,8 +44,10 @@ class StartSystem
 
     addSystems(sysConfigs) // add gameplay systems
 
+    // remove title-screen entities
+    val fRemove: Future[Unit] = removeEntities(titleEntities)
     for {
-      _ <- removeEntities(titleEntities) // remove title-screen entities
+      _ <- fRemove
       e <- titleEntities
       (_, comp) <- e.components
     } comp ! PoisonPill

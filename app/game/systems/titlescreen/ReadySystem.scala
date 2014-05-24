@@ -1,4 +1,4 @@
-package game.systems.startscreen
+package game.systems.titlescreen
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -12,9 +12,9 @@ import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import scala.concurrent.Future
 import game.components.common.io.InputComponent
-import game.components.startscreen.ReadyComponent
-import game.components.startscreen.ReadyComponent.Snapshot
-import game.components.startscreen.TitleObserverComponent.UpdateEntities
+import game.components.titlescreen.ReadyComponent
+import game.components.titlescreen.ReadyComponent.Snapshot
+import game.components.titlescreen.TitleObserverComponent.UpdateEntities
 
 object ReadySystem {
   implicit val timeout: Timeout = 1.second
@@ -23,7 +23,7 @@ object ReadySystem {
 }
 
 class ReadySystem
-  extends System(100.millis)
+  extends System(50.millis)
   with ActorLogging {
 
   import ReadySystem._

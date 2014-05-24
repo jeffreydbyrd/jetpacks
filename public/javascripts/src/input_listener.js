@@ -1,6 +1,5 @@
 function InputListener() {
 	var self = this;
-	var connection;
 	var keybindings = COMMANDS.keyBindings;
 
 	// For some keys, we need to know when the user releases it:

@@ -1,8 +1,8 @@
-package game.components.startscreen
+package game.components.titlescreen
 
 import akka.actor.{PoisonPill, Props, ActorRef, Actor}
 import doppelengine.entity.EntityId
-import game.components.startscreen.ReadyComponent.Snapshot
+import game.components.titlescreen.ReadyComponent.Snapshot
 import game.components.common.io.ClientCommand
 
 object TitleObserverComponent {
@@ -30,5 +30,11 @@ class TitleObserverComponent extends Actor {
         }
 
       conn ! ClientCommand.UpdateIntro(tuples.toMap)
+  }
+
+  override def postStop() = {
+    for (conn <- connection) {
+      conn ! ClientCommand.GamePlayStart
+    }
   }
 }

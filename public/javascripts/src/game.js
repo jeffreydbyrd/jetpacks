@@ -14,8 +14,11 @@ function Game(canvasX, canvasY, kx, ky) {
     renderer.render(stage);
   }
 
-  function convertXPos(x) { return x * kx }
-  function convertYPos(y){ return canvasY - (y * ky) }
+  self.convertXPos = function(x) { return x * kx };
+  self.convertYPos = function(y){ return canvasY - (y * ky) };
+
+  self.convertWidth = function(w) {return w * kx};
+  self.convertHeight = function(h) {return h * ky};
 
   var intro = null;
   self.updateIntro = function(statuses) {
@@ -32,6 +35,10 @@ function Game(canvasX, canvasY, kx, ky) {
 
     intro = new PIXI.Text(text, {font:"24px Arial"});
     stage.addChild(intro);
+  };
+
+  self.startGamePlay = function() {
+    stage.removeChild(intro);
   };
 
   self.create = function(id, x, y, w, h) {
@@ -52,37 +59,5 @@ function Game(canvasX, canvasY, kx, ky) {
   self.move = function(id, x, y) {
     entities[id].position.x = x;
     entities[id].position.y = y;
-  };
-
-  self.bindTo = function(conn) {
-    conn.onReceive("create", function(params) {
-      self.create(params.id,
-                  convertXPos(params.position[0]),
-                  convertYPos(params.position[1]),
-                  params.dimensions[0] * kx,
-                  params.dimensions[1] * ky);
-    });
-
-    conn.onReceive("update-positions", function(params) {
-      for(id in params) {
-        self.move(id,
-                  convertXPos(params[id][0]),
-                  convertYPos(params[id][1]) );
-      }
-    });
-
-    conn.onReceive("update-intro", function(params){
-      self.updateIntro(params);
-    });
-
-    conn.onReceive("quit", function(params) {
-      conn.close();
-      document.write("<p>I enjoyed our time together!</p>");
-    });
-
-    conn.onReceive("error", function(message) {
-      conn.close();
-      document.write("<p>Unable to connect: " + message + "</p>");
-    });
   };
 }

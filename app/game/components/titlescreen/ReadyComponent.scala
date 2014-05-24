@@ -1,8 +1,8 @@
-package game.components.startscreen
+package game.components.titlescreen
 
 import akka.actor.{Props, Actor}
 import doppelengine.component.Component.RequestSnapshot
-import game.components.startscreen.ReadyComponent.Snapshot
+import game.components.titlescreen.ReadyComponent.Snapshot
 
 object ReadyComponent {
 

@@ -22,6 +22,12 @@ object ClientCommand {
     override val toJson = JsNull
   }
 
+  case object GamePlayStart extends ClientCommand {
+    override val typ: String = "gameplay-start"
+    override val doRetry: Boolean = true
+    override val toJson: JsValue = JsNull
+  }
+
   case class CreateRect(id: String,
                         p: Position,
                         r: Rect) extends ClientCommand {

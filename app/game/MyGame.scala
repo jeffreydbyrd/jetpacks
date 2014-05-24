@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import doppelengine.system.SystemConfig
 import game.systems.common.{ConnectionSystem, QuitSystem}
-import game.systems.startscreen.{StartSystem, ReadySystem}
+import game.systems.titlescreen.{StartSystem, ReadySystem}
 
 object MyGame {
 

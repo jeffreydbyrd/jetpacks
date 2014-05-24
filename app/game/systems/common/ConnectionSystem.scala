@@ -10,7 +10,7 @@ import doppelengine.entity.{Entity, EntityConfig}
 import game.components.common.connection.PlayActorConnection
 import play.api.libs.json.{Json, JsValue}
 import game.MyGame
-import game.entities.startscreen.StartScreenEntity
+import game.entities.titlescreen.TitleScreenEntity
 import akka.util.Timeout
 
 object ConnectionSystem {
@@ -51,7 +51,7 @@ class ConnectionSystem extends System(0.millis) {
   def connectPlayer(username: String) = {
     val (enumerator, channel) = play.api.libs.iteratee.Concurrent.broadcast[JsValue]
 
-    val config: EntityConfig = StartScreenEntity.config(username)
+    val config: EntityConfig = TitleScreenEntity.config(username)
     val connection =
       context.actorOf(PlayActorConnection.props(channel), s"conn-$username")
 

@@ -1,12 +1,12 @@
-package game.entities.startscreen
+package game.entities.titlescreen
 
 import doppelengine.entity.{EntityId, EntityConfig}
 import doppelengine.component.ComponentConfig
 import game.components.common.io.InputComponent
-import game.components.startscreen.{ReadyComponent, TitleObserverComponent}
+import game.components.titlescreen.{ReadyComponent, TitleObserverComponent}
 import game.components.types.{Ready, TitleObserver, Input}
 
-object StartScreenEntity {
+object TitleScreenEntity {
   def config(name: String): EntityConfig = {
     val input =
       new ComponentConfig(InputComponent.props, s"input-$name")

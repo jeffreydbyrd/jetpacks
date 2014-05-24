@@ -18,10 +18,19 @@
   var kx = canvasx / internal_dimensions;
 
   var game = new Game(canvasy, canvasy, ky, ky)
-  var listener = new InputListener();
   var conn = new Connection(address);
 
-  listener.bindTo(conn);
-  game.bindTo(conn);
+  conn.onReceive("quit", function(params) {
+    conn.close();
+    document.write("<p>I enjoyed our time together!</p>");
+  });
+
+  conn.onReceive("error", function(message) {
+    conn.close();
+    document.write("<p>Unable to connect: " + message + "</p>");
+  });
+
+  bindToKeyboard(conn);
+  bindToGame(conn, game);
   conn.start();
 })()
